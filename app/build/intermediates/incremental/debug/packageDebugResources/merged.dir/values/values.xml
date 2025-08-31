@@ -13,6 +13,7 @@
     <color name="pizza_red_dark">#B22222</color>
     <color name="white">#FFFFFFFF</color>
     <string name="active_recipe_title">Active Recipe</string>
+    <string name="adjust_recipe_variables">Adjust recipe variables to your preference</string>
     <string name="alarm_channel_description">Notifications for recipe steps</string>
     <string name="alarm_channel_name">Recipe Alarms</string>
     <string name="alarm_recipe_complete">Pizza dough is ready!</string>
@@ -22,9 +23,11 @@
     <string name="app_name">Pizza Planner</string>
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
+    <string name="choose_recipe">Choose Recipe</string>
     <string name="completion_time">Ready: %s</string>
     <string name="current_step">Current Step</string>
     <string name="customizable_variables">Customizable Variables</string>
+    <string name="customize_recipe">Customize Recipe</string>
     <string name="customize_variables">Customize Recipe</string>
     <string name="delete">Delete</string>
     <string name="download_recipes">Download Recipe Updates</string>
@@ -53,6 +56,11 @@
     <string name="recipe_total_time">Total time: %d hours</string>
     <string name="retry">Retry</string>
     <string name="save">Save</string>
+    <string name="save_plan">Save Plan</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_recipe">Select Recipe</string>
+    <string name="select_recipe_to_start_planning">Select a recipe above to start planning your pizza dough</string>
+    <string name="select_time">Select Time</string>
     <string name="settings_title">Settings</string>
     <string name="start_recipe">Start Recipe</string>
     <string name="start_time">Start: %s</string>
@@ -67,6 +75,7 @@
     <string name="variable_temperature">Temperature</string>
     <string name="variable_yeast_amount">Yeast Amount</string>
     <string name="vibration">Vibration</string>
+    <string name="when_do_you_want_pizza_ready">When do you want your pizza ready?</string>
     <style name="Theme.PizzaPlanner" parent="Theme.Material3.DayNight">
         
         <item name="colorPrimary">@color/pizza_orange</item>

@@ -76,4 +76,15 @@
     <string name="customizable_variables">Customizable Variables</string>
     <string name="recipe_steps">Recipe Steps</string>
     <string name="plan_this_recipe">Plan This Recipe</string>
+    
+    <!-- Planning UI -->
+    <string name="select_recipe">Select Recipe</string>
+    <string name="choose_recipe">Choose Recipe</string>
+    <string name="when_do_you_want_pizza_ready">When do you want your pizza ready?</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_time">Select Time</string>
+    <string name="customize_recipe">Customize Recipe</string>
+    <string name="adjust_recipe_variables">Adjust recipe variables to your preference</string>
+    <string name="save_plan">Save Plan</string>
+    <string name="select_recipe_to_start_planning">Select a recipe above to start planning your pizza dough</string>
 </resources>
