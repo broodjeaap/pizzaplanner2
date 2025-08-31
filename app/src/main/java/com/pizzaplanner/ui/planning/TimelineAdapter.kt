@@ -28,6 +28,7 @@ class TimelineAdapter : ListAdapter<TimelineStepItem, TimelineAdapter.ViewHolder
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+        private val dateFormatter = DateTimeFormatter.ofPattern("MMM d")
 
         fun bind(item: TimelineStepItem, isFirst: Boolean, isLast: Boolean) {
             binding.apply {
@@ -36,6 +37,7 @@ class TimelineAdapter : ListAdapter<TimelineStepItem, TimelineAdapter.ViewHolder
                 viewTimelineBottom.visibility = if (isLast) View.INVISIBLE else View.VISIBLE
                 
                 // Set step information
+                textViewStepDate.text = formatDate(item.startTime)
                 textViewStepTime.text = item.startTime.format(timeFormatter)
                 textViewStepName.text = item.stepName
                 
@@ -70,6 +72,19 @@ class TimelineAdapter : ListAdapter<TimelineStepItem, TimelineAdapter.ViewHolder
                 minutes < 60 -> "${minutes}m"
                 minutes % 60 == 0 -> "${minutes / 60}h"
                 else -> "${minutes / 60}h ${minutes % 60}m"
+            }
+        }
+        
+        private fun formatDate(dateTime: LocalDateTime): String {
+            val now = LocalDateTime.now()
+            val today = now.toLocalDate()
+            val stepDate = dateTime.toLocalDate()
+            
+            return when {
+                stepDate == today -> "Today"
+                stepDate == today.plusDays(1) -> "Tomorrow"
+                stepDate == today.minusDays(1) -> "Yesterday"
+                else -> dateTime.format(dateFormatter)
             }
         }
     }

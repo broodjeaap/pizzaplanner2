@@ -18,6 +18,7 @@ class TimelineDialogAdapter(
 ) : ListAdapter<StepTimeline, TimelineDialogAdapter.TimelineStepViewHolder>(TimelineStepDiffCallback()) {
 
     private val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    private val dateFormatter = DateTimeFormatter.ofPattern("MMM d")
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimelineStepViewHolder {
         val binding = ItemTimelineStepDialogBinding.inflate(
@@ -43,6 +44,7 @@ class TimelineDialogAdapter(
                 textViewStepDescription.text = stepTimeline.processedDescription
                 
                 // Timing information
+                textViewStartDate.text = formatDate(stepTimeline.startTime)
                 textViewStartTime.text = stepTimeline.startTime.format(timeFormatter)
                 textViewEndTime.text = stepTimeline.endTime.format(timeFormatter)
                 
@@ -120,6 +122,19 @@ class TimelineDialogAdapter(
             // Handle timeline lines visibility
             binding.viewTopLine.visibility = if (position == 0) View.INVISIBLE else View.VISIBLE
             binding.viewBottomLine.visibility = if (position == itemCount - 1) View.INVISIBLE else View.VISIBLE
+        }
+        
+        private fun formatDate(dateTime: LocalDateTime): String {
+            val now = LocalDateTime.now()
+            val today = now.toLocalDate()
+            val stepDate = dateTime.toLocalDate()
+            
+            return when {
+                stepDate == today -> "Today"
+                stepDate == today.plusDays(1) -> "Tomorrow"
+                stepDate == today.minusDays(1) -> "Yesterday"
+                else -> dateTime.format(dateFormatter)
+            }
         }
     }
     

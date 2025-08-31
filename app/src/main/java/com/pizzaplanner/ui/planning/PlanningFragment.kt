@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
+import com.pizzaplanner.data.models.PlannedRecipe
+import com.pizzaplanner.data.models.RecipeStatus
+import com.pizzaplanner.data.repository.PlannedRecipeRepository
 import com.pizzaplanner.databinding.FragmentPlanningBinding
 import com.pizzaplanner.utils.TimeCalculationService
 import com.pizzaplanner.utils.YamlParser
@@ -38,6 +41,7 @@ class PlanningFragment : Fragment() {
     private val variableValues = mutableMapOf<String, Double>()
     
     private val timeCalculationService = TimeCalculationService()
+    private lateinit var plannedRecipeRepository: PlannedRecipeRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +55,7 @@ class PlanningFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        plannedRecipeRepository = PlannedRecipeRepository(requireContext())
         setupRecyclerViews()
         setupClickListeners()
         updateUI()
@@ -263,13 +268,34 @@ class PlanningFragment : Fragment() {
         try {
             val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
             
-            // TODO: Save to local storage and schedule alarms
-            // TODO: Navigate to active recipe screen
+            // Create planned recipe
+            val plannedRecipe = PlannedRecipe(
+                id = "active_recipe_${System.currentTimeMillis()}",
+                recipeId = recipe.id,
+                recipeName = recipe.name,
+                targetCompletionTime = targetTime,
+                startTime = timeline.startTime,
+                variableValues = variableValues,
+                status = RecipeStatus.IN_PROGRESS,
+                currentStepIndex = 0
+            )
+            
+            // Save to repository
+            plannedRecipeRepository.saveActiveRecipe(
+                plannedRecipe = plannedRecipe,
+                recipeTimeline = timeline,
+                currentStepIndex = 0,
+                status = RecipeStatus.IN_PROGRESS,
+                isPaused = false
+            )
             
             Toast.makeText(requireContext(), "Recipe started! Check the Active tab.", Toast.LENGTH_LONG).show()
             
-            // Switch to active tab
-            // This would require communication with the main activity
+            // Clear current planning
+            selectedRecipe = null
+            targetDateTime = null
+            variableValues.clear()
+            updateUI()
             
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error starting recipe", Toast.LENGTH_SHORT).show()

@@ -66,6 +66,9 @@ dependencies {
     // YAML parsing
     implementation 'org.yaml:snakeyaml:2.0'
     
+    // JSON parsing for data persistence
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
     // HTTP client for recipe downloads
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     

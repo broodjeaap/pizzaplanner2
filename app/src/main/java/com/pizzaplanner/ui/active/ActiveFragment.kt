@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.*
+import com.pizzaplanner.data.repository.PlannedRecipeRepository
 import com.pizzaplanner.databinding.FragmentActiveBinding
 import com.pizzaplanner.databinding.DialogTimelineBinding
 import com.pizzaplanner.utils.RecipeTimeline
@@ -26,11 +27,12 @@ class ActiveFragment : Fragment() {
     private var _binding: FragmentActiveBinding? = null
     private val binding get() = _binding!!
     
-    // Mock active recipe data - in a real app this would come from a repository/database
     private var activeRecipe: PlannedRecipe? = null
     private var recipeTimeline: RecipeTimeline? = null
     private var currentStepIndex: Int = 0
     private var isPaused: Boolean = false
+    
+    private lateinit var repository: PlannedRecipeRepository
     
     // Timer for step countdown
     private var stepTimer: CountDownTimer? = null
@@ -51,6 +53,7 @@ class ActiveFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        repository = PlannedRecipeRepository(requireContext())
         setupClickListeners()
         loadActiveRecipe()
         updateUI()
@@ -79,99 +82,28 @@ class ActiveFragment : Fragment() {
     }
     
     private fun loadActiveRecipe() {
-        // Mock data - in a real app this would load from database/repository
-        // For demo purposes, create a sample active recipe
-        createMockActiveRecipe()
+        if (repository.hasActiveRecipe()) {
+            activeRecipe = repository.getActiveRecipe()
+            recipeTimeline = repository.getActiveRecipeTimeline()
+            currentStepIndex = repository.getCurrentStepIndex()
+            isPaused = repository.isRecipePaused()
+            
+            // Update the status from repository
+            activeRecipe?.let { recipe ->
+                activeRecipe = recipe.copy(status = repository.getRecipeStatus())
+            }
+            
+            // Start timer if recipe is in progress and not paused
+            if (activeRecipe?.status == RecipeStatus.IN_PROGRESS && !isPaused) {
+                startStepTimer()
+            }
+        } else {
+            // No active recipe
+            activeRecipe = null
+            recipeTimeline = null
+        }
     }
     
-    private fun createMockActiveRecipe() {
-        // This is mock data for demonstration
-        // In a real app, this would be loaded from storage when a recipe is started from planning
-        
-        val mockRecipe = Recipe(
-            id = "neapolitan",
-            name = "Classic Neapolitan Pizza",
-            description = "Traditional Neapolitan pizza dough",
-            variables = listOf(
-                RecipeVariable("rise_time", "Rise Time", 24.0, 1.0, 48.0, VariableType.INTEGER, "hours")
-            ),
-            steps = listOf(
-                RecipeStep("mix", "Mix ingredients", "Combine flour, water, salt, and yeast", 30, timing = StepTiming.START),
-                RecipeStep("knead", "Knead dough", "Knead until smooth and elastic", 15, timing = StepTiming.AFTER_PREVIOUS),
-                RecipeStep("rise", "First rise", "Let dough rise in covered bowl", null, "rise_time * 60", StepTiming.AFTER_PREVIOUS),
-                RecipeStep("divide", "Divide dough", "Divide into portions", 10, timing = StepTiming.AFTER_PREVIOUS),
-                RecipeStep("final_rise", "Final rise", "Let portions rise", 120, timing = StepTiming.AFTER_PREVIOUS)
-            ),
-            difficulty = "Medium",
-            totalTimeHours = 25
-        )
-        
-        activeRecipe = PlannedRecipe(
-            id = "active_recipe_1",
-            recipeId = mockRecipe.id,
-            recipeName = mockRecipe.name,
-            targetCompletionTime = LocalDateTime.now().plusHours(2),
-            startTime = LocalDateTime.now().minusMinutes(45),
-            variableValues = mapOf("rise_time" to 24.0),
-            status = RecipeStatus.IN_PROGRESS,
-            currentStepIndex = 1 // Currently on "knead" step
-        )
-        
-        // Create mock timeline
-        val now = LocalDateTime.now()
-        recipeTimeline = RecipeTimeline(
-            recipe = mockRecipe,
-            variableValues = mapOf("rise_time" to 24.0),
-            startTime = now.minusMinutes(45),
-            targetCompletionTime = now.plusHours(2),
-            totalDurationMinutes = 165,
-            steps = listOf(
-                StepTimeline(
-                    step = mockRecipe.steps[0],
-                    processedDescription = "Combine flour, water, salt, and yeast",
-                    processedTemperature = null,
-                    durationMinutes = 30,
-                    startTime = now.minusMinutes(45),
-                    endTime = now.minusMinutes(15)
-                ),
-                StepTimeline(
-                    step = mockRecipe.steps[1],
-                    processedDescription = "Knead until smooth and elastic",
-                    processedTemperature = null,
-                    durationMinutes = 15,
-                    startTime = now.minusMinutes(15),
-                    endTime = now
-                ),
-                StepTimeline(
-                    step = mockRecipe.steps[2],
-                    processedDescription = "Let dough rise in covered bowl",
-                    processedTemperature = null,
-                    durationMinutes = 1440, // 24 hours
-                    startTime = now,
-                    endTime = now.plusHours(24)
-                ),
-                StepTimeline(
-                    step = mockRecipe.steps[3],
-                    processedDescription = "Divide into portions",
-                    processedTemperature = null,
-                    durationMinutes = 10,
-                    startTime = now.plusHours(24),
-                    endTime = now.plusHours(24).plusMinutes(10)
-                ),
-                StepTimeline(
-                    step = mockRecipe.steps[4],
-                    processedDescription = "Let portions rise",
-                    processedTemperature = null,
-                    durationMinutes = 120,
-                    startTime = now.plusHours(24).plusMinutes(10),
-                    endTime = now.plusHours(26).plusMinutes(10)
-                )
-            )
-        )
-        
-        currentStepIndex = 1 // Currently on knead step
-        startStepTimer()
-    }
     
     private fun updateUI() {
         val recipe = activeRecipe
@@ -276,29 +208,35 @@ class ActiveFragment : Fragment() {
         val timeline = recipeTimeline ?: return
         if (currentStepIndex >= timeline.steps.size) return
         
-        val currentStep = timeline.steps[currentStepIndex]
+        val currentStep = timeline.steps.getOrNull(currentStepIndex) ?: return
         if (currentStep.durationMinutes <= 0) return
         
         val now = LocalDateTime.now()
-        val stepEndTime = currentStep.endTime
-        stepTimeRemainingMs = ChronoUnit.MILLIS.between(now, stepEndTime)
+        val stepEndTime = currentStep.endTime ?: return // Add null check
         
-        if (stepTimeRemainingMs <= 0) return
-        
-        stepTimer?.cancel()
-        stepTimer = object : CountDownTimer(stepTimeRemainingMs, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                stepTimeRemainingMs = millisUntilFinished
-                updateStepTimer()
-            }
+        try {
+            stepTimeRemainingMs = ChronoUnit.MILLIS.between(now, stepEndTime)
             
-            override fun onFinish() {
-                stepTimeRemainingMs = 0
-                updateStepTimer()
-                // Auto-advance to next step or show completion notification
-                showStepCompletionNotification()
-            }
-        }.start()
+            if (stepTimeRemainingMs <= 0) return
+            
+            stepTimer?.cancel()
+            stepTimer = object : CountDownTimer(stepTimeRemainingMs, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    stepTimeRemainingMs = millisUntilFinished
+                    updateStepTimer()
+                }
+                
+                override fun onFinish() {
+                    stepTimeRemainingMs = 0
+                    updateStepTimer()
+                    // Auto-advance to next step or show completion notification
+                    showStepCompletionNotification()
+                }
+            }.start()
+        } catch (e: Exception) {
+            // If there's any issue with time calculations, just skip the timer
+            return
+        }
     }
     
     private fun updateStepTimer() {
@@ -315,6 +253,9 @@ class ActiveFragment : Fragment() {
     private fun togglePauseResume() {
         isPaused = !isPaused
         
+        // Update repository
+        repository.updatePausedStatus(isPaused)
+        
         if (isPaused) {
             stepTimer?.cancel()
         } else {
@@ -330,6 +271,9 @@ class ActiveFragment : Fragment() {
     private fun completeCurrentStep() {
         stepTimer?.cancel()
         currentStepIndex++
+        
+        // Update repository
+        repository.updateCurrentStepIndex(currentStepIndex)
         
         val timeline = recipeTimeline ?: return
         
@@ -367,6 +311,11 @@ class ActiveFragment : Fragment() {
     
     private fun cancelRecipe() {
         stepTimer?.cancel()
+        
+        // Update repository
+        repository.updateRecipeStatus(RecipeStatus.CANCELLED)
+        repository.clearActiveRecipe()
+        
         activeRecipe = null
         recipeTimeline = null
         updateUI()
@@ -375,6 +324,10 @@ class ActiveFragment : Fragment() {
     
     private fun completeRecipe() {
         stepTimer?.cancel()
+        
+        // Update repository
+        repository.updateRecipeStatus(RecipeStatus.COMPLETED)
+        
         activeRecipe = activeRecipe?.copy(status = RecipeStatus.COMPLETED)
         
         MaterialAlertDialogBuilder(requireContext())
@@ -382,6 +335,7 @@ class ActiveFragment : Fragment() {
             .setMessage("Congratulations! Your pizza dough is ready.")
             .setPositiveButton("Great!") { _, _ ->
                 // Clear active recipe
+                repository.clearActiveRecipe()
                 activeRecipe = null
                 recipeTimeline = null
                 updateUI()
