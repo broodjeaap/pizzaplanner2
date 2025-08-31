@@ -1,0 +1,63 @@
+package com.pizzaplanner.ui.recipes
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.pizzaplanner.data.models.RecipeStep
+import com.pizzaplanner.data.models.StepTiming
+import com.pizzaplanner.databinding.ItemRecipeStepBinding
+
+class RecipeStepsAdapter : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHolder>(StepDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StepViewHolder {
+        val binding = ItemRecipeStepBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return StepViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: StepViewHolder, position: Int) {
+        holder.bind(getItem(position), position + 1)
+    }
+
+    inner class StepViewHolder(
+        private val binding: ItemRecipeStepBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(step: RecipeStep, stepNumber: Int) {
+            binding.apply {
+                textViewStepNumber.text = stepNumber.toString()
+                textViewStepTitle.text = step.name
+                textViewStepDescription.text = step.description
+                textViewStepTiming.text = when (step.timing) {
+                    StepTiming.START -> "At start"
+                    StepTiming.AFTER_PREVIOUS -> "After previous step"
+                    StepTiming.PARALLEL -> "In parallel"
+                    StepTiming.SCHEDULED -> "Scheduled timing"
+                }
+                
+                // Show duration if available
+                step.durationMinutes?.let { duration ->
+                    textViewStepDuration.text = "Duration: ${duration} min"
+                    textViewStepDuration.visibility = android.view.View.VISIBLE
+                } ?: run {
+                    textViewStepDuration.visibility = android.view.View.GONE
+                }
+            }
+        }
+    }
+
+    private class StepDiffCallback : DiffUtil.ItemCallback<RecipeStep>() {
+        override fun areItemsTheSame(oldItem: RecipeStep, newItem: RecipeStep): Boolean {
+            return oldItem.name == newItem.name
+        }
+
+        override fun areContentsTheSame(oldItem: RecipeStep, newItem: RecipeStep): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

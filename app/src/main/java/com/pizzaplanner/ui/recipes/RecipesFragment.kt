@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pizzaplanner.databinding.FragmentRecipesBinding
 import com.pizzaplanner.utils.YamlParser
@@ -41,8 +42,9 @@ class RecipesFragment : Fragment() {
 
     private fun setupRecyclerView() {
         recipesAdapter = RecipesAdapter { recipe ->
-            // Navigate to planning fragment with selected recipe
-            // This will be implemented when we create the navigation logic
+            // Navigate to recipe detail fragment
+            val action = RecipesFragmentDirections.actionRecipesToRecipeDetail(recipe)
+            findNavController().navigate(action)
         }
         
         binding.recyclerViewRecipes.apply {

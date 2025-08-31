@@ -9,7 +9,24 @@
         android:id="@+id/navigation_recipes"
         android:name="com.pizzaplanner.ui.recipes.RecipesFragment"
         android:label="@string/nav_recipes"
-        tools:layout="@layout/fragment_recipes" />
+        tools:layout="@layout/fragment_recipes">
+        <action
+            android:id="@+id/action_recipes_to_recipe_detail"
+            app:destination="@id/navigation_recipe_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_recipe_detail"
+        android:name="com.pizzaplanner.ui.recipes.RecipeDetailFragment"
+        android:label="Recipe Detail"
+        tools:layout="@layout/fragment_recipe_detail">
+        <argument
+            android:name="recipe"
+            app:argType="com.pizzaplanner.data.models.Recipe" />
+        <action
+            android:id="@+id/action_recipe_detail_to_planning_with_recipe"
+            app:destination="@id/navigation_planning" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_planning"

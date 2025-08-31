@@ -1,15 +1,11 @@
 package com.pizzaplanner.data.models
 
 import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
-@Entity(tableName = "planned_recipes")
 @Parcelize
 data class PlannedRecipe(
-    @PrimaryKey
     val id: String,
     val recipeId: String,
     val recipeName: String,

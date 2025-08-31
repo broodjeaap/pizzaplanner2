@@ -70,4 +70,10 @@
     <string name="error_loading_recipes">Failed to load recipes</string>
     <string name="error_invalid_time">Please select a valid completion time</string>
     <string name="error_alarm_permission">Alarm permission required for notifications</string>
+    
+    <!-- Recipe Detail -->
+    <string name="back">Back</string>
+    <string name="customizable_variables">Customizable Variables</string>
+    <string name="recipe_steps">Recipe Steps</string>
+    <string name="plan_this_recipe">Plan This Recipe</string>
 </resources>
