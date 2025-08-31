@@ -268,6 +268,9 @@ class PlanningFragment : Fragment() {
         try {
             val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
             
+            // Get event name from input
+            val eventName = binding.editTextEventName.text?.toString()?.trim()
+            
             // Create planned recipe
             val plannedRecipe = PlannedRecipe(
                 id = "active_recipe_${System.currentTimeMillis()}",
@@ -277,7 +280,8 @@ class PlanningFragment : Fragment() {
                 startTime = timeline.startTime,
                 variableValues = variableValues,
                 status = RecipeStatus.IN_PROGRESS,
-                currentStepIndex = 0
+                currentStepIndex = 0,
+                eventName = if (eventName.isNullOrEmpty()) null else eventName
             )
             
             // Save to repository
@@ -295,6 +299,7 @@ class PlanningFragment : Fragment() {
             selectedRecipe = null
             targetDateTime = null
             variableValues.clear()
+            binding.editTextEventName.text?.clear()
             updateUI()
             
         } catch (e: Exception) {

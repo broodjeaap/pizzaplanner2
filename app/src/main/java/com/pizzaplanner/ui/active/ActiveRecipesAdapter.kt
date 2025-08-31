@@ -1,6 +1,7 @@
 package com.pizzaplanner.ui.active
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -46,6 +47,14 @@ class ActiveRecipesAdapter(
                     RecipeStatus.COMPLETED -> "Completed"
                     RecipeStatus.CANCELLED -> "Cancelled"
                     else -> "Unknown"
+                }
+                
+                // Event name
+                if (!activeRecipe.recipe.eventName.isNullOrEmpty()) {
+                    textViewEventName.text = activeRecipe.recipe.eventName
+                    textViewEventName.visibility = View.VISIBLE
+                } else {
+                    textViewEventName.visibility = View.GONE
                 }
 
                 // Progress

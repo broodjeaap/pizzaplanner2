@@ -133,6 +133,14 @@ class ActiveRecipeDetailFragment : Fragment() {
             else -> "Unknown"
         }
         
+        // Event name
+        if (!data.recipe.eventName.isNullOrEmpty()) {
+            binding.textViewEventName.text = data.recipe.eventName
+            binding.textViewEventName.visibility = View.VISIBLE
+        } else {
+            binding.textViewEventName.visibility = View.GONE
+        }
+        
         // Update pause/resume button
         binding.buttonPauseResume.text = if (data.isPaused) getString(R.string.resume) else getString(R.string.pause)
         binding.buttonPauseResume.setIconResource(if (data.isPaused) R.drawable.ic_time else R.drawable.ic_pause)
@@ -170,18 +178,14 @@ class ActiveRecipeDetailFragment : Fragment() {
         binding.textViewNextStepName.text = nextStep.step.name
         
         val startTime = nextStep.startTime
-        if (startTime != null) {
-            try {
-                val timeUntilNext = ChronoUnit.MINUTES.between(LocalDateTime.now(), startTime)
-                binding.textViewNextStepTime.text = when {
-                    timeUntilNext <= 0 -> "Ready to start"
-                    timeUntilNext < 60 -> "Starts in ${timeUntilNext}m"
-                    else -> "Starts in ${timeUntilNext / 60}h ${timeUntilNext % 60}m"
-                }
-            } catch (e: Exception) {
-                binding.textViewNextStepTime.text = "Ready to start"
+        try {
+            val timeUntilNext = ChronoUnit.MINUTES.between(LocalDateTime.now(), startTime)
+            binding.textViewNextStepTime.text = when {
+                timeUntilNext <= 0 -> "Ready to start"
+                timeUntilNext < 60 -> "Starts in ${timeUntilNext}m"
+                else -> "Starts in ${timeUntilNext / 60}h ${timeUntilNext % 60}m"
             }
-        } else {
+        } catch (e: Exception) {
             binding.textViewNextStepTime.text = "Ready to start"
         }
     }

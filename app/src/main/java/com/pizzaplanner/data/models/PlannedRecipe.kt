@@ -15,6 +15,7 @@ data class PlannedRecipe(
     val status: RecipeStatus = RecipeStatus.SCHEDULED,
     val currentStepIndex: Int = 0,
     val createdAt: LocalDateTime = LocalDateTime.now(),
+    val eventName: String? = null,
     val notes: String? = null
 ) : Parcelable
 
