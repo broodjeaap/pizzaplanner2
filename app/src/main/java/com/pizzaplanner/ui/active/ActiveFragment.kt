@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.*
 import com.pizzaplanner.databinding.FragmentActiveBinding
+import com.pizzaplanner.databinding.DialogTimelineBinding
 import com.pizzaplanner.utils.RecipeTimeline
 import com.pizzaplanner.utils.StepTimeline
 import kotlinx.coroutines.launch
@@ -72,8 +74,7 @@ class ActiveFragment : Fragment() {
         }
         
         binding.buttonViewTimeline.setOnClickListener {
-            // TODO: Navigate to timeline view or show timeline dialog
-            Toast.makeText(requireContext(), "Timeline view coming soon!", Toast.LENGTH_SHORT).show()
+            showTimelineDialog()
         }
     }
     
@@ -403,6 +404,40 @@ class ActiveFragment : Fragment() {
             }
             .setNegativeButton("Continue", null)
             .show()
+    }
+    
+    private fun showTimelineDialog() {
+        val recipe = activeRecipe ?: return
+        val timeline = recipeTimeline ?: return
+        
+        val dialogBinding = DialogTimelineBinding.inflate(layoutInflater)
+        
+        // Set up dialog content
+        dialogBinding.textViewRecipeNameTimeline.text = recipe.recipeName
+        dialogBinding.textViewStartTimeTimeline.text = recipe.startTime.format(dateTimeFormatter)
+        dialogBinding.textViewCompletionTimeTimeline.text = recipe.targetCompletionTime.format(dateTimeFormatter)
+        
+        // Set up RecyclerView
+        val adapter = TimelineDialogAdapter(currentStepIndex)
+        dialogBinding.recyclerViewTimelineSteps.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            this.adapter = adapter
+        }
+        
+        // Submit timeline steps to adapter
+        adapter.submitList(timeline.steps)
+        
+        // Create and show dialog
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+        
+        // Set up close button
+        dialogBinding.buttonCloseTimeline.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
     
     override fun onDestroyView() {
