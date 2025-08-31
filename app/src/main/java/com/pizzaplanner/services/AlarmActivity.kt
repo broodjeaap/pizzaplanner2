@@ -1,0 +1,71 @@
+package com.pizzaplanner.services
+
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import com.pizzaplanner.databinding.ActivityAlarmBinding
+
+class AlarmActivity : AppCompatActivity() {
+    
+    private lateinit var binding: ActivityAlarmBinding
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        // Show over lock screen
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            )
+        }
+        
+        binding = ActivityAlarmBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        setupAlarmDisplay()
+        setupClickListeners()
+    }
+    
+    private fun setupAlarmDisplay() {
+        val stepName = intent.getStringExtra("step_name") ?: "Recipe Step"
+        val message = intent.getStringExtra("message") ?: "Time for next step!"
+        val alarmType = intent.getStringExtra("alarm_type") ?: "STEP_START"
+        
+        binding.apply {
+            textViewStepName.text = stepName
+            textViewMessage.text = message
+            
+            // Customize based on alarm type
+            when (alarmType) {
+                "FINAL_COMPLETION" -> {
+                    textViewTitle.text = "🍕 Pizza Dough Ready!"
+                    buttonDismiss.text = "Awesome!"
+                }
+                "STEP_START" -> {
+                    textViewTitle.text = "⏰ Time for Next Step"
+                    buttonDismiss.text = "Got it!"
+                }
+                else -> {
+                    textViewTitle.text = "📋 Recipe Alert"
+                    buttonDismiss.text = "OK"
+                }
+            }
+        }
+    }
+    
+    private fun setupClickListeners() {
+        binding.buttonDismiss.setOnClickListener {
+            finish()
+        }
+        
+        binding.buttonSnooze.setOnClickListener {
+            // TODO: Implement snooze functionality
+            finish()
+        }
+    }
+}

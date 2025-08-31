@@ -1,0 +1,210 @@
+recipes:
+  - id: "neapolitan_pizza_dough"
+    name: "Neapolitan Pizza Dough"
+    description: "Traditional Italian thin crust pizza dough with long fermentation for maximum flavor"
+    difficulty: "Medium"
+    total_time_hours: 24
+    image_url: null
+    variables:
+      - name: "rise_time_hours"
+        display: "Rise Time (hours)"
+        default: 24
+        min: 6
+        max: 72
+        type: "integer"
+        unit: "hours"
+      - name: "dough_balls"
+        display: "Number of Dough Balls"
+        default: 4
+        min: 1
+        max: 12
+        type: "integer"
+        unit: "pieces"
+      - name: "ambient_temp_c"
+        display: "Room Temperature (°C)"
+        default: 22
+        min: 18
+        max: 30
+        type: "integer"
+        unit: "°C"
+      - name: "yeast_amount_g"
+        display: "Yeast Amount (g)"
+        default: 2
+        min: 1
+        max: 5
+        type: "decimal"
+        unit: "g"
+    steps:
+      - id: "mix_ingredients"
+        name: "Mix ingredients"
+        description: "Combine 1kg flour, 650ml water, 20g salt, and {yeast_amount_g}g fresh yeast in a large bowl"
+        duration_minutes: 10
+        timing: "start"
+        temperature: "Room temperature"
+        notes: "Use lukewarm water (around 25°C)"
+      - id: "knead_dough"
+        name: "Knead dough"
+        description: "Knead the dough until smooth and elastic, about 10-15 minutes by hand"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "Dough should be slightly sticky but manageable"
+      - id: "first_rise"
+        name: "First rise (bulk fermentation)"
+        description: "Let dough rise in covered bowl at room temperature"
+        duration_formula: "rise_time_hours * 0.4 * 60"
+        timing: "after_previous"
+        temperature: "{ambient_temp_c}°C"
+        notes: "Dough should roughly double in size"
+      - id: "divide_shape"
+        name: "Divide and shape"
+        description: "Divide dough into {dough_balls} equal portions and shape into balls"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "Use a kitchen scale for even portions"
+      - id: "final_rise"
+        name: "Final rise"
+        description: "Let shaped dough balls rise until ready to use"
+        duration_formula: "rise_time_hours * 0.6 * 60"
+        timing: "after_previous"
+        temperature: "{ambient_temp_c}°C"
+        notes: "Dough is ready when it springs back slowly when poked"
+
+  - id: "new_york_pizza_dough"
+    name: "New York Style Pizza Dough"
+    description: "Classic New York pizza dough with a chewy texture and crispy bottom"
+    difficulty: "Easy"
+    total_time_hours: 48
+    variables:
+      - name: "rise_time_hours"
+        display: "Rise Time (hours)"
+        default: 48
+        min: 24
+        max: 96
+        type: "integer"
+        unit: "hours"
+      - name: "dough_balls"
+        display: "Number of Dough Balls"
+        default: 3
+        min: 1
+        max: 8
+        type: "integer"
+        unit: "pieces"
+      - name: "ambient_temp_c"
+        display: "Room Temperature (°C)"
+        default: 20
+        min: 18
+        max: 25
+        type: "integer"
+        unit: "°C"
+      - name: "oil_amount_ml"
+        display: "Olive Oil (ml)"
+        default: 30
+        min: 20
+        max: 50
+        type: "integer"
+        unit: "ml"
+    steps:
+      - id: "mix_dry"
+        name: "Mix dry ingredients"
+        description: "Combine 500g bread flour, 10g salt, and 3g active dry yeast"
+        duration_minutes: 5
+        timing: "start"
+      - id: "add_liquids"
+        name: "Add liquids"
+        description: "Add 320ml cool water and {oil_amount_ml}ml olive oil to dry ingredients"
+        duration_minutes: 5
+        timing: "after_previous"
+        notes: "Water should be around 18-20°C for slow fermentation"
+      - id: "mix_dough"
+        name: "Mix dough"
+        description: "Mix until dough comes together, don't overwork"
+        duration_minutes: 8
+        timing: "after_previous"
+        notes: "Dough will be slightly rough, this is normal"
+      - id: "bulk_ferment"
+        name: "Bulk fermentation"
+        description: "Let dough rise in oiled container in refrigerator"
+        duration_formula: "rise_time_hours * 0.7 * 60"
+        timing: "after_previous"
+        temperature: "4°C (refrigerator)"
+        notes: "Cold fermentation develops flavor"
+      - id: "portion_dough"
+        name: "Portion dough"
+        description: "Remove from fridge and divide into {dough_balls} portions"
+        duration_minutes: 10
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "final_proof"
+        name: "Final proofing"
+        description: "Let portions come to room temperature and final proof"
+        duration_formula: "rise_time_hours * 0.3 * 60"
+        timing: "after_previous"
+        temperature: "{ambient_temp_c}°C"
+        notes: "Dough is ready when it feels soft and pliable"
+
+  - id: "sicilian_pizza_dough"
+    name: "Sicilian Pizza Dough"
+    description: "Thick, airy Sicilian-style pizza dough perfect for deep dish pans"
+    difficulty: "Hard"
+    total_time_hours: 72
+    variables:
+      - name: "rise_time_hours"
+        display: "Rise Time (hours)"
+        default: 72
+        min: 48
+        max: 120
+        type: "integer"
+        unit: "hours"
+      - name: "pan_size_cm"
+        display: "Pan Size (cm)"
+        default: 30
+        min: 25
+        max: 40
+        type: "integer"
+        unit: "cm"
+      - name: "ambient_temp_c"
+        display: "Room Temperature (°C)"
+        default: 21
+        min: 18
+        max: 24
+        type: "integer"
+        unit: "°C"
+      - name: "hydration_percent"
+        display: "Hydration (%)"
+        default: 75
+        min: 70
+        max: 80
+        type: "integer"
+        unit: "%"
+    steps:
+      - id: "autolyse"
+        name: "Autolyse"
+        description: "Mix 600g bread flour with calculated water amount, let rest"
+        duration_minutes: 30
+        timing: "start"
+        notes: "Water amount: 600g × {hydration_percent}/100"
+      - id: "add_salt_yeast"
+        name: "Add salt and yeast"
+        description: "Add 12g salt and 1g active dry yeast to autolyse"
+        duration_minutes: 5
+        timing: "after_previous"
+      - id: "mix_develop"
+        name: "Mix and develop"
+        description: "Mix thoroughly and perform stretch and folds"
+        duration_minutes: 20
+        timing: "after_previous"
+        notes: "Perform 4 sets of stretch and folds, 5 minutes apart"
+      - id: "bulk_fermentation"
+        name: "Bulk fermentation"
+        description: "First rise in oiled container"
+        duration_formula: "rise_time_hours * 0.5 * 60"
+        timing: "after_previous"
+        temperature: "{ambient_temp_c}°C"
+        notes: "Dough should increase by 50-70%"
+      - id: "pan_proof"
+        name: "Pan proofing"
+        description: "Transfer to oiled {pan_size_cm}cm pan and spread gently"
+        duration_formula: "rise_time_hours * 0.5 * 60"
+        timing: "after_previous"
+        temperature: "{ambient_temp_c}°C"
+        notes: "Don't force the dough, let it relax and spread naturally"

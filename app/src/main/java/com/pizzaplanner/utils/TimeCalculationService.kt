@@ -1,0 +1,241 @@
+package com.pizzaplanner.utils
+
+import com.pizzaplanner.data.models.*
+import java.time.LocalDateTime
+import kotlin.math.roundToInt
+
+class TimeCalculationService {
+    
+    fun calculateRecipeTimeline(
+        recipe: Recipe,
+        variableValues: Map<String, Double>,
+        targetCompletionTime: LocalDateTime
+    ): RecipeTimeline {
+        val processedSteps = processSteps(recipe.steps, variableValues)
+        val totalDurationMinutes = calculateTotalDuration(processedSteps)
+        val startTime = targetCompletionTime.minusMinutes(totalDurationMinutes.toLong())
+        
+        val stepTimeline = calculateStepTimeline(processedSteps, startTime)
+        
+        return RecipeTimeline(
+            recipe = recipe,
+            variableValues = variableValues,
+            startTime = startTime,
+            targetCompletionTime = targetCompletionTime,
+            totalDurationMinutes = totalDurationMinutes,
+            steps = stepTimeline
+        )
+    }
+    
+    private fun processSteps(
+        steps: List<RecipeStep>,
+        variableValues: Map<String, Double>
+    ): List<ProcessedStep> {
+        return steps.map { step ->
+            val duration = calculateStepDuration(step, variableValues)
+            val processedDescription = substituteVariables(step.description, variableValues)
+            val processedTemperature = step.temperature?.let { substituteVariables(it, variableValues) }
+            
+            ProcessedStep(
+                step = step,
+                durationMinutes = duration,
+                processedDescription = processedDescription,
+                processedTemperature = processedTemperature
+            )
+        }
+    }
+    
+    private fun calculateStepDuration(
+        step: RecipeStep,
+        variableValues: Map<String, Double>
+    ): Int {
+        return when {
+            step.durationMinutes != null -> step.durationMinutes
+            step.durationFormula != null -> {
+                evaluateFormula(step.durationFormula, variableValues).roundToInt()
+            }
+            else -> 0 // Default for steps without duration
+        }
+    }
+    
+    private fun evaluateFormula(formula: String, variables: Map<String, Double>): Double {
+        var expression = formula
+        
+        // Replace variables with their values
+        variables.forEach { (name, value) ->
+            expression = expression.replace(name, value.toString())
+        }
+        
+        // Simple expression evaluator for basic arithmetic
+        return try {
+            evaluateSimpleExpression(expression)
+        } catch (e: Exception) {
+            0.0 // Return 0 if formula evaluation fails
+        }
+    }
+    
+    private fun evaluateSimpleExpression(expression: String): Double {
+        // Remove spaces
+        val expr = expression.replace(" ", "")
+        
+        // Handle multiplication and division first
+        var result = expr
+        val multiplyDivideRegex = Regex("([0-9.]+)\\s*([*/])\\s*([0-9.]+)")
+        
+        while (multiplyDivideRegex.containsMatchIn(result)) {
+            result = multiplyDivideRegex.replace(result) { matchResult ->
+                val left = matchResult.groupValues[1].toDouble()
+                val operator = matchResult.groupValues[2]
+                val right = matchResult.groupValues[3].toDouble()
+                
+                when (operator) {
+                    "*" -> (left * right).toString()
+                    "/" -> (left / right).toString()
+                    else -> matchResult.value
+                }
+            }
+        }
+        
+        // Handle addition and subtraction
+        val addSubtractRegex = Regex("([0-9.]+)\\s*([+-])\\s*([0-9.]+)")
+        
+        while (addSubtractRegex.containsMatchIn(result)) {
+            result = addSubtractRegex.replace(result) { matchResult ->
+                val left = matchResult.groupValues[1].toDouble()
+                val operator = matchResult.groupValues[2]
+                val right = matchResult.groupValues[3].toDouble()
+                
+                when (operator) {
+                    "+" -> (left + right).toString()
+                    "-" -> (left - right).toString()
+                    else -> matchResult.value
+                }
+            }
+        }
+        
+        return result.toDoubleOrNull() ?: 0.0
+    }
+    
+    private fun substituteVariables(text: String, variables: Map<String, Double>): String {
+        var result = text
+        variables.forEach { (name, value) ->
+            val placeholder = "{$name}"
+            val displayValue = if (value == value.toInt().toDouble()) {
+                value.toInt().toString()
+            } else {
+                String.format("%.1f", value)
+            }
+            result = result.replace(placeholder, displayValue)
+        }
+        return result
+    }
+    
+    private fun calculateTotalDuration(steps: List<ProcessedStep>): Int {
+        return steps.sumOf { it.durationMinutes }
+    }
+    
+    private fun calculateStepTimeline(
+        steps: List<ProcessedStep>,
+        startTime: LocalDateTime
+    ): List<StepTimeline> {
+        val timeline = mutableListOf<StepTimeline>()
+        var currentTime = startTime
+        
+        steps.forEach { processedStep ->
+            val stepStartTime = currentTime
+            val stepEndTime = currentTime.plusMinutes(processedStep.durationMinutes.toLong())
+            
+            timeline.add(
+                StepTimeline(
+                    step = processedStep.step,
+                    processedDescription = processedStep.processedDescription,
+                    processedTemperature = processedStep.processedTemperature,
+                    durationMinutes = processedStep.durationMinutes,
+                    startTime = stepStartTime,
+                    endTime = stepEndTime
+                )
+            )
+            
+            currentTime = stepEndTime
+        }
+        
+        return timeline
+    }
+    
+    fun generateAlarmEvents(
+        plannedRecipeId: String,
+        timeline: RecipeTimeline
+    ): List<AlarmEvent> {
+        val alarms = mutableListOf<AlarmEvent>()
+        
+        timeline.steps.forEach { stepTimeline ->
+            // Alarm for step start
+            alarms.add(
+                AlarmEvent(
+                    id = "${plannedRecipeId}_${stepTimeline.step.id}_start",
+                    plannedRecipeId = plannedRecipeId,
+                    stepId = stepTimeline.step.id,
+                    stepName = stepTimeline.step.name,
+                    scheduledTime = stepTimeline.startTime,
+                    alarmType = AlarmType.STEP_START,
+                    message = "Time to start: ${stepTimeline.step.name}"
+                )
+            )
+            
+            // Alarm for step end (if step has duration)
+            if (stepTimeline.durationMinutes > 0) {
+                alarms.add(
+                    AlarmEvent(
+                        id = "${plannedRecipeId}_${stepTimeline.step.id}_end",
+                        plannedRecipeId = plannedRecipeId,
+                        stepId = stepTimeline.step.id,
+                        stepName = stepTimeline.step.name,
+                        scheduledTime = stepTimeline.endTime,
+                        alarmType = AlarmType.STEP_END,
+                        message = "Step completed: ${stepTimeline.step.name}"
+                    )
+                )
+            }
+        }
+        
+        // Final completion alarm
+        alarms.add(
+            AlarmEvent(
+                id = "${plannedRecipeId}_completion",
+                plannedRecipeId = plannedRecipeId,
+                stepId = "completion",
+                stepName = "Recipe Complete",
+                scheduledTime = timeline.targetCompletionTime,
+                alarmType = AlarmType.FINAL_COMPLETION,
+                message = "Pizza dough is ready!"
+            )
+        )
+        
+        return alarms
+    }
+}
+
+data class RecipeTimeline(
+    val recipe: Recipe,
+    val variableValues: Map<String, Double>,
+    val startTime: LocalDateTime,
+    val targetCompletionTime: LocalDateTime,
+    val totalDurationMinutes: Int,
+    val steps: List<StepTimeline>
+)
+
+data class ProcessedStep(
+    val step: RecipeStep,
+    val durationMinutes: Int,
+    val processedDescription: String,
+    val processedTemperature: String?
+)
+
+data class StepTimeline(
+    val step: RecipeStep,
+    val processedDescription: String,
+    val processedTemperature: String?,
+    val durationMinutes: Int,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime
+)

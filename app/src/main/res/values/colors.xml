@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pizza_orange">#FF8C00</color>
+    <color name="pizza_orange_dark">#FF6600</color>
+    <color name="pizza_red">#DC143C</color>
+    <color name="pizza_red_dark">#B22222</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    
+    <!-- Additional colors for UI elements -->
+    <color name="light_gray">#F5F5F5</color>
+    <color name="medium_gray">#CCCCCC</color>
+    <color name="dark_gray">#666666</color>
+    
+    <!-- Difficulty colors -->
+    <color name="difficulty_easy">#4CAF50</color>
+    <color name="difficulty_medium">#FF9800</color>
+    <color name="difficulty_hard">#F44336</color>
+</resources>
