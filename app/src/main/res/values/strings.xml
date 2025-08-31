@@ -28,7 +28,7 @@
     <string name="current_step">Current Step</string>
     <string name="next_step">Next Step</string>
     <string name="step_complete">Mark Complete</string>
-    <string name="recipe_progress">Progress: %d/%d steps</string>
+    <string name="recipe_progress">Progress: %1$d/%2$d steps</string>
     <string name="time_remaining">Time remaining: %s</string>
     
     <!-- Alarms -->
@@ -56,9 +56,9 @@
     <string name="retry">Retry</string>
     
     <!-- Time formats -->
-    <string name="time_format_hours_minutes">%dh %dm</string>
+    <string name="time_format_hours_minutes">%1$dh %2$dm</string>
     <string name="time_format_minutes">%dm</string>
-    <string name="time_format_datetime">%s at %s</string>
+    <string name="time_format_datetime">%1$s at %2$s</string>
     
     <!-- Variables -->
     <string name="variable_rise_time">Rise Time</string>
@@ -87,4 +87,13 @@
     <string name="adjust_recipe_variables">Adjust recipe variables to your preference</string>
     <string name="save_plan">Save Plan</string>
     <string name="select_recipe_to_start_planning">Select a recipe above to start planning your pizza dough</string>
+    
+    <!-- Active Recipe UI -->
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="skip_step">Skip Step</string>
+    <string name="cancel_recipe">Cancel Recipe</string>
+    <string name="view_timeline">View Timeline</string>
+    <string name="no_active_recipe">No active recipe</string>
+    <string name="start_recipe_from_planning">Start a recipe from the Planning tab to track your progress here</string>
 </resources>

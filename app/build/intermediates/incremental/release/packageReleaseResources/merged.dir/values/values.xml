@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="black">#FF000000</color>
+    <color name="dark_gray">#666666</color>
+    <color name="difficulty_easy">#4CAF50</color>
+    <color name="difficulty_hard">#F44336</color>
+    <color name="difficulty_medium">#FF9800</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="medium_gray">#CCCCCC</color>
+    <color name="pizza_orange">#FF8C00</color>
+    <color name="pizza_orange_dark">#FF6600</color>
+    <color name="pizza_red">#DC143C</color>
+    <color name="pizza_red_dark">#B22222</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="active_recipe_title">Active Recipe</string>
+    <string name="adjust_recipe_variables">Adjust recipe variables to your preference</string>
+    <string name="alarm_channel_description">Notifications for recipe steps</string>
+    <string name="alarm_channel_name">Recipe Alarms</string>
+    <string name="alarm_recipe_complete">Pizza dough is ready!</string>
+    <string name="alarm_sound">Alarm Sound</string>
+    <string name="alarm_step_end">Step completed: %s</string>
+    <string name="alarm_step_start">Time to start: %s</string>
+    <string name="app_name">Pizza Planner</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="cancel_recipe">Cancel Recipe</string>
+    <string name="choose_recipe">Choose Recipe</string>
+    <string name="completion_time">Ready: %s</string>
+    <string name="current_step">Current Step</string>
+    <string name="customizable_variables">Customizable Variables</string>
+    <string name="customize_recipe">Customize Recipe</string>
+    <string name="customize_variables">Customize Recipe</string>
+    <string name="delete">Delete</string>
+    <string name="download_recipes">Download Recipe Updates</string>
+    <string name="edit">Edit</string>
+    <string name="error">Error</string>
+    <string name="error_alarm_permission">Alarm permission required for notifications</string>
+    <string name="error_invalid_time">Please select a valid completion time</string>
+    <string name="error_loading_recipes">Failed to load recipes</string>
+    <string name="loading">Loading...</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_planning">Planning</string>
+    <string name="nav_recipes">Recipes</string>
+    <string name="nav_settings">Settings</string>
+    <string name="next_step">Next Step</string>
+    <string name="no_active_recipe">No active recipe</string>
+    <string name="notification_style">Notification Style</string>
+    <string name="ok">OK</string>
+    <string name="pause">Pause</string>
+    <string name="plan_this_recipe">Plan This Recipe</string>
+    <string name="planning_title">Plan Your Dough</string>
+    <string name="recipe_difficulty_easy">Easy</string>
+    <string name="recipe_difficulty_hard">Hard</string>
+    <string name="recipe_difficulty_medium">Medium</string>
+    <string name="recipe_progress">Progress: %1$d/%2$d steps</string>
+    <string name="recipe_selection_title">Choose Your Recipe</string>
+    <string name="recipe_steps">Recipe Steps</string>
+    <string name="recipe_timeline">Recipe Timeline</string>
+    <string name="recipe_total_time">Total time: %d hours</string>
+    <string name="resume">Resume</string>
+    <string name="retry">Retry</string>
+    <string name="save">Save</string>
+    <string name="save_plan">Save Plan</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_recipe">Select Recipe</string>
+    <string name="select_recipe_to_start_planning">Select a recipe above to start planning your pizza dough</string>
+    <string name="select_time">Select Time</string>
+    <string name="settings_title">Settings</string>
+    <string name="skip_step">Skip Step</string>
+    <string name="start_recipe">Start Recipe</string>
+    <string name="start_recipe_from_planning">Start a recipe from the Planning tab to track your progress here</string>
+    <string name="start_time">Start: %s</string>
+    <string name="step_complete">Mark Complete</string>
+    <string name="target_completion_time">When do you want your dough ready?</string>
+    <string name="time_format_datetime">%1$s at %2$s</string>
+    <string name="time_format_hours_minutes">%1$dh %2$dm</string>
+    <string name="time_format_minutes">%dm</string>
+    <string name="time_remaining">Time remaining: %s</string>
+    <string name="variable_dough_balls">Dough Balls</string>
+    <string name="variable_rise_time">Rise Time</string>
+    <string name="variable_temperature">Temperature</string>
+    <string name="variable_yeast_amount">Yeast Amount</string>
+    <string name="vibration">Vibration</string>
+    <string name="view_timeline">View Timeline</string>
+    <string name="when_do_you_want_pizza_ready">When do you want your pizza ready?</string>
+    <style name="Theme.PizzaPlanner" parent="Theme.Material3.DayNight">
+        
+        <item name="colorPrimary">@color/pizza_orange</item>
+        <item name="colorPrimaryVariant">@color/pizza_orange_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <item name="colorSecondary">@color/pizza_red</item>
+        <item name="colorSecondaryVariant">@color/pizza_red_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+        
+    </style>
+    <style name="Theme.PizzaPlanner.FullScreen" parent="Theme.PizzaPlanner">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+</resources>
