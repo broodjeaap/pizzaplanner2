@@ -1,0 +1,129 @@
+package com.pizzaplanner.ui.active
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.pizzaplanner.data.repository.PlannedRecipeRepository.ActiveRecipeData
+import com.pizzaplanner.databinding.ItemActiveRecipeBinding
+import com.pizzaplanner.data.models.RecipeStatus
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
+class ActiveRecipesAdapter(
+    private val onRecipeClick: (ActiveRecipeData) -> Unit
+) : ListAdapter<ActiveRecipeData, ActiveRecipesAdapter.ActiveRecipeViewHolder>(ActiveRecipeDiffCallback()) {
+
+    private val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, h:mm a")
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActiveRecipeViewHolder {
+        val binding = ItemActiveRecipeBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ActiveRecipeViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ActiveRecipeViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    inner class ActiveRecipeViewHolder(
+        private val binding: ItemActiveRecipeBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(activeRecipe: ActiveRecipeData) {
+            with(binding) {
+                // Recipe info
+                textViewRecipeName.text = activeRecipe.recipe.recipeName
+                textViewRecipeStatus.text = when (activeRecipe.status) {
+                    RecipeStatus.IN_PROGRESS -> if (activeRecipe.isPaused) "Paused" else "In Progress"
+                    RecipeStatus.SCHEDULED -> "Scheduled"
+                    RecipeStatus.COMPLETED -> "Completed"
+                    RecipeStatus.CANCELLED -> "Cancelled"
+                    else -> "Unknown"
+                }
+
+                // Progress
+                val totalSteps = activeRecipe.timeline.steps.size
+                val completedSteps = activeRecipe.currentStepIndex
+                val progressPercent = if (totalSteps > 0) {
+                    (completedSteps.toFloat() / totalSteps * 100).toInt()
+                } else 0
+
+                progressIndicator.progress = progressPercent
+                textViewProgress.text = "${progressPercent}%"
+                chipCurrentStep.text = "Step ${activeRecipe.currentStepIndex + 1}/$totalSteps"
+
+                // Current step
+                val currentStep = activeRecipe.timeline.steps.getOrNull(activeRecipe.currentStepIndex)
+                if (currentStep != null) {
+                    textViewCurrentStepName.text = currentStep.step.name
+                    
+                    // Show timer if step has duration and recipe is in progress
+                    if (currentStep.durationMinutes > 0 && activeRecipe.status == RecipeStatus.IN_PROGRESS && !activeRecipe.isPaused) {
+                        val now = LocalDateTime.now()
+                        val stepEndTime = currentStep.endTime
+                        if (stepEndTime != null) {
+                            try {
+                                val timeRemaining = ChronoUnit.MINUTES.between(now, stepEndTime)
+                                if (timeRemaining > 0) {
+                                    textViewStepTimer.text = "${timeRemaining}m remaining"
+                                    textViewStepTimer.visibility = android.view.View.VISIBLE
+                                } else {
+                                    textViewStepTimer.visibility = android.view.View.GONE
+                                }
+                            } catch (e: Exception) {
+                                textViewStepTimer.visibility = android.view.View.GONE
+                            }
+                        } else {
+                            textViewStepTimer.visibility = android.view.View.GONE
+                        }
+                    } else {
+                        textViewStepTimer.visibility = android.view.View.GONE
+                    }
+                } else {
+                    textViewCurrentStepName.text = "Recipe Complete"
+                    textViewStepTimer.visibility = android.view.View.GONE
+                }
+
+                // Time info
+                textViewStartTime.text = formatDateTime(activeRecipe.recipe.startTime)
+                textViewCompletionTime.text = formatDateTime(activeRecipe.recipe.targetCompletionTime)
+
+                // Click listener
+                root.setOnClickListener {
+                    onRecipeClick(activeRecipe)
+                }
+            }
+        }
+
+        private fun formatDateTime(dateTime: LocalDateTime): String {
+            val now = LocalDateTime.now()
+            val today = now.toLocalDate()
+            val tomorrow = today.plusDays(1)
+            val yesterday = today.minusDays(1)
+
+            return when (dateTime.toLocalDate()) {
+                today -> "Today, ${dateTime.format(timeFormatter)}"
+                tomorrow -> "Tomorrow, ${dateTime.format(timeFormatter)}"
+                yesterday -> "Yesterday, ${dateTime.format(timeFormatter)}"
+                else -> dateTime.format(dateTimeFormatter)
+            }
+        }
+    }
+
+    private class ActiveRecipeDiffCallback : DiffUtil.ItemCallback<ActiveRecipeData>() {
+        override fun areItemsTheSame(oldItem: ActiveRecipeData, newItem: ActiveRecipeData): Boolean {
+            return oldItem.recipe.id == newItem.recipe.id
+        }
+
+        override fun areContentsTheSame(oldItem: ActiveRecipeData, newItem: ActiveRecipeData): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

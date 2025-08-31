@@ -23,11 +23,7 @@ class PlannedRecipeRepository(context: Context) {
         .create()
     
     companion object {
-        private const val KEY_ACTIVE_RECIPE = "active_recipe"
-        private const val KEY_ACTIVE_TIMELINE = "active_timeline"
-        private const val KEY_CURRENT_STEP_INDEX = "current_step_index"
-        private const val KEY_RECIPE_STATUS = "recipe_status"
-        private const val KEY_IS_PAUSED = "is_paused"
+        private const val KEY_ACTIVE_RECIPES = "active_recipes"
     }
     
     fun saveActiveRecipe(
@@ -37,85 +33,70 @@ class PlannedRecipeRepository(context: Context) {
         status: RecipeStatus = RecipeStatus.IN_PROGRESS,
         isPaused: Boolean = false
     ) {
-        with(sharedPreferences.edit()) {
-            // Convert LocalDateTime to string for storage
-            val recipeJson = gson.toJson(plannedRecipe.copy(
-                startTime = plannedRecipe.startTime,
-                targetCompletionTime = plannedRecipe.targetCompletionTime
-            ))
-            
-            val timelineJson = gson.toJson(recipeTimeline)
-            
-            putString(KEY_ACTIVE_RECIPE, recipeJson)
-            putString(KEY_ACTIVE_TIMELINE, timelineJson)
-            putInt(KEY_CURRENT_STEP_INDEX, currentStepIndex)
-            putString(KEY_RECIPE_STATUS, status.name)
-            putBoolean(KEY_IS_PAUSED, isPaused)
-            apply()
-        }
+        val activeRecipeData = ActiveRecipeData(
+            recipe = plannedRecipe,
+            timeline = recipeTimeline,
+            currentStepIndex = currentStepIndex,
+            status = status,
+            isPaused = isPaused
+        )
+        
+        val activeRecipes = getActiveRecipesList().toMutableList()
+        
+        // Remove existing recipe with same ID if it exists
+        activeRecipes.removeAll { it.recipe.id == plannedRecipe.id }
+        
+        // Add new recipe
+        activeRecipes.add(activeRecipeData)
+        
+        // Save updated list
+        val json = gson.toJson(activeRecipes)
+        sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
     }
     
-    fun getActiveRecipe(): PlannedRecipe? {
-        val recipeJson = sharedPreferences.getString(KEY_ACTIVE_RECIPE, null) ?: return null
+    fun getActiveRecipesList(): List<ActiveRecipeData> {
+        val json = sharedPreferences.getString(KEY_ACTIVE_RECIPES, null) ?: return emptyList()
         return try {
-            gson.fromJson(recipeJson, PlannedRecipe::class.java)
+            val type = object : TypeToken<List<ActiveRecipeData>>() {}.type
+            gson.fromJson(json, type) ?: emptyList()
         } catch (e: Exception) {
-            null
+            emptyList()
         }
     }
     
-    fun getActiveRecipeTimeline(): RecipeTimeline? {
-        val timelineJson = sharedPreferences.getString(KEY_ACTIVE_TIMELINE, null) ?: return null
-        return try {
-            gson.fromJson(timelineJson, RecipeTimeline::class.java)
-        } catch (e: Exception) {
-            null
+    fun getActiveRecipe(recipeId: String): ActiveRecipeData? {
+        return getActiveRecipesList().find { it.recipe.id == recipeId }
+    }
+    
+    fun updateActiveRecipe(recipeId: String, updater: (ActiveRecipeData) -> ActiveRecipeData) {
+        val activeRecipes = getActiveRecipesList().toMutableList()
+        val index = activeRecipes.indexOfFirst { it.recipe.id == recipeId }
+        if (index != -1) {
+            activeRecipes[index] = updater(activeRecipes[index])
+            val json = gson.toJson(activeRecipes)
+            sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
         }
     }
     
-    fun getCurrentStepIndex(): Int {
-        return sharedPreferences.getInt(KEY_CURRENT_STEP_INDEX, 0)
+    fun removeActiveRecipe(recipeId: String) {
+        val activeRecipes = getActiveRecipesList().toMutableList()
+        activeRecipes.removeAll { it.recipe.id == recipeId }
+        val json = gson.toJson(activeRecipes)
+        sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
     }
     
-    fun getRecipeStatus(): RecipeStatus {
-        val statusString = sharedPreferences.getString(KEY_RECIPE_STATUS, RecipeStatus.SCHEDULED.name)
-        return try {
-            RecipeStatus.valueOf(statusString ?: RecipeStatus.SCHEDULED.name)
-        } catch (e: Exception) {
-            RecipeStatus.SCHEDULED
-        }
+    fun hasActiveRecipes(): Boolean {
+        return getActiveRecipesList().isNotEmpty()
     }
     
-    fun isRecipePaused(): Boolean {
-        return sharedPreferences.getBoolean(KEY_IS_PAUSED, false)
-    }
-    
-    fun updateCurrentStepIndex(index: Int) {
-        sharedPreferences.edit().putInt(KEY_CURRENT_STEP_INDEX, index).apply()
-    }
-    
-    fun updateRecipeStatus(status: RecipeStatus) {
-        sharedPreferences.edit().putString(KEY_RECIPE_STATUS, status.name).apply()
-    }
-    
-    fun updatePausedStatus(isPaused: Boolean) {
-        sharedPreferences.edit().putBoolean(KEY_IS_PAUSED, isPaused).apply()
-    }
-    
-    fun clearActiveRecipe() {
-        with(sharedPreferences.edit()) {
-            remove(KEY_ACTIVE_RECIPE)
-            remove(KEY_ACTIVE_TIMELINE)
-            remove(KEY_CURRENT_STEP_INDEX)
-            remove(KEY_RECIPE_STATUS)
-            remove(KEY_IS_PAUSED)
-            apply()
-        }
-    }
-    
-    fun hasActiveRecipe(): Boolean {
-        return sharedPreferences.contains(KEY_ACTIVE_RECIPE)
-    }
+    // Data class for storing active recipe with all its state
+    data class ActiveRecipeData(
+        val recipe: PlannedRecipe,
+        val timeline: RecipeTimeline,
+        val currentStepIndex: Int = 0,
+        val status: RecipeStatus = RecipeStatus.IN_PROGRESS,
+        val isPaused: Boolean = false
+    )
     
     // Custom TypeAdapter for LocalDateTime
     private class LocalDateTimeAdapter : TypeAdapter<LocalDateTime>() {

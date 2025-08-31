@@ -38,7 +38,21 @@
         android:id="@+id/navigation_active"
         android:name="com.pizzaplanner.ui.active.ActiveFragment"
         android:label="@string/nav_active"
-        tools:layout="@layout/fragment_active" />
+        tools:layout="@layout/fragment_active_list">
+        <action
+            android:id="@+id/action_active_to_active_recipe_detail"
+            app:destination="@id/navigation_active_recipe_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_active_recipe_detail"
+        android:name="com.pizzaplanner.ui.active.ActiveRecipeDetailFragment"
+        android:label="Active Recipe Detail"
+        tools:layout="@layout/fragment_active">
+        <argument
+            android:name="recipeId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
