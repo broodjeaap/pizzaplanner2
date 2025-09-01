@@ -76,7 +76,7 @@ class AlarmService(private val context: Context) {
     
     fun scheduleMultipleAlarms(alarmEvents: List<AlarmEvent>) {
         alarmEvents.forEach { alarmEvent ->
-            if (alarmEvent.isActive && alarmEvent.scheduledTime.isAfter(LocalDateTime.now())) {
+            if (alarmEvent.scheduledTime.isAfter(LocalDateTime.now())) {
                 scheduleAlarm(alarmEvent)
             }
         }

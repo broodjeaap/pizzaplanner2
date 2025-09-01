@@ -162,57 +162,6 @@ class TimeCalculationService {
         return timeline
     }
     
-    fun generateAlarmEvents(
-        plannedRecipeId: String,
-        timeline: RecipeTimeline
-    ): List<AlarmEvent> {
-        val alarms = mutableListOf<AlarmEvent>()
-        
-        timeline.steps.forEach { stepTimeline ->
-            // Alarm for step start
-            alarms.add(
-                AlarmEvent(
-                    id = "${plannedRecipeId}_${stepTimeline.step.id}_start",
-                    plannedRecipeId = plannedRecipeId,
-                    stepId = stepTimeline.step.id,
-                    stepName = stepTimeline.step.name,
-                    scheduledTime = stepTimeline.startTime,
-                    alarmType = AlarmType.STEP_START,
-                    message = "Time to start: ${stepTimeline.step.name}"
-                )
-            )
-            
-            // Alarm for step end (if step has duration)
-            if (stepTimeline.durationMinutes > 0) {
-                alarms.add(
-                    AlarmEvent(
-                        id = "${plannedRecipeId}_${stepTimeline.step.id}_end",
-                        plannedRecipeId = plannedRecipeId,
-                        stepId = stepTimeline.step.id,
-                        stepName = stepTimeline.step.name,
-                        scheduledTime = stepTimeline.endTime,
-                        alarmType = AlarmType.STEP_END,
-                        message = "Step completed: ${stepTimeline.step.name}"
-                    )
-                )
-            }
-        }
-        
-        // Final completion alarm
-        alarms.add(
-            AlarmEvent(
-                id = "${plannedRecipeId}_completion",
-                plannedRecipeId = plannedRecipeId,
-                stepId = "completion",
-                stepName = "Recipe Complete",
-                scheduledTime = timeline.targetCompletionTime,
-                alarmType = AlarmType.FINAL_COMPLETION,
-                message = "Pizza dough is ready!"
-            )
-        )
-        
-        return alarms
-    }
 }
 
 data class RecipeTimeline(

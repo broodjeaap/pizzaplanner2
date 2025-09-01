@@ -77,9 +77,9 @@ class RecipeDetailFragment : Fragment() {
 
     private fun setupClickListeners(recipe: Recipe) {
         binding.buttonPlanRecipe.setOnClickListener {
-            // Navigate to planning fragment
+            // Navigate to planning fragment with recipe as argument
             val action = RecipeDetailFragmentDirections
-                .actionRecipeDetailToPlanningWithRecipe()
+                .actionRecipeDetailToPlanningWithRecipe(recipe)
             findNavController().navigate(action)
         }
         

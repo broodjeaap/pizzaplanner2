@@ -28,25 +28,6 @@ enum class RecipeStatus : Parcelable {
     CANCELLED
 }
 
-@Parcelize
-data class AlarmEvent(
-    val id: String,
-    val plannedRecipeId: String,
-    val stepId: String,
-    val stepName: String,
-    val scheduledTime: LocalDateTime,
-    val alarmType: AlarmType,
-    val isActive: Boolean = true,
-    val message: String
-) : Parcelable
-
-@Parcelize
-enum class AlarmType : Parcelable {
-    STEP_START,
-    STEP_END,
-    REMINDER,
-    FINAL_COMPLETION
-}
 
 @Parcelize
 data class RecipeProgress(

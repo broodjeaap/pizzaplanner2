@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
@@ -19,6 +20,9 @@ import com.pizzaplanner.data.models.PlannedRecipe
 import com.pizzaplanner.data.models.RecipeStatus
 import com.pizzaplanner.data.repository.PlannedRecipeRepository
 import com.pizzaplanner.databinding.FragmentPlanningBinding
+import com.pizzaplanner.services.AlarmService
+import com.pizzaplanner.data.models.AlarmEvent
+import com.pizzaplanner.data.models.AlarmType
 import com.pizzaplanner.utils.TimeCalculationService
 import com.pizzaplanner.utils.YamlParser
 import kotlinx.coroutines.launch
@@ -37,6 +41,7 @@ class PlanningFragment : Fragment() {
     private lateinit var timelineAdapter: TimelineAdapter
     
     private var selectedRecipe: Recipe? = null
+    private var passedRecipe: Recipe? = null
     private var targetDateTime: LocalDateTime? = null
     private val variableValues = mutableMapOf<String, Double>()
     
@@ -58,6 +63,13 @@ class PlanningFragment : Fragment() {
         plannedRecipeRepository = PlannedRecipeRepository(requireContext())
         setupRecyclerViews()
         setupClickListeners()
+        
+        // Check for passed recipe argument
+        arguments?.getParcelable<Recipe>("recipe")?.let { recipe ->
+            passedRecipe = recipe
+            selectRecipe(recipe)
+        }
+        
         updateUI()
     }
     
@@ -132,6 +144,12 @@ class PlanningFragment : Fragment() {
             variableValues[variable.name] = variable.defaultValue
         }
         
+        updateUI()
+    }
+    
+    private fun resetRecipeSelection() {
+        selectedRecipe = null
+        variableValues.clear()
         updateUI()
     }
     
@@ -292,6 +310,19 @@ class PlanningFragment : Fragment() {
                 status = RecipeStatus.IN_PROGRESS,
                 isPaused = false
             )
+            
+            // Schedule alarms for recipe steps
+            val alarmService = AlarmService(requireContext())
+            val alarmEvents = timeline.steps.map { step ->
+                AlarmEvent(
+                    id = "${plannedRecipe.id}_${step.step.id}",
+                    stepName = step.step.name,
+                    message = step.processedDescription,
+                    scheduledTime = step.startTime,
+                    alarmType = AlarmType.NOTIFICATION
+                )
+            }
+            alarmService.scheduleMultipleAlarms(alarmEvents)
             
             Toast.makeText(requireContext(), "Recipe started! Check the Active tab.", Toast.LENGTH_LONG).show()
             

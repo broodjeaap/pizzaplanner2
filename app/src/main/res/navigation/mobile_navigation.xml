@@ -32,7 +32,11 @@
         android:id="@+id/navigation_planning"
         android:name="com.pizzaplanner.ui.planning.PlanningFragment"
         android:label="@string/nav_planning"
-        tools:layout="@layout/fragment_planning" />
+        tools:layout="@layout/fragment_planning">
+        <argument
+            android:name="recipe"
+            app:argType="com.pizzaplanner.data.models.Recipe" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_active"
