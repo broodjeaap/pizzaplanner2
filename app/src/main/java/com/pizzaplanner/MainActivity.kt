@@ -89,17 +89,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPermissionExplanation() {
-        // Show a dialog explaining why permissions are needed
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Permissions Required")
-            .setMessage("Pizza Planner needs notification and alarm permissions to alert you when it's time to perform recipe steps. Without these permissions, you won't receive timely reminders.")
-            .setPositiveButton("Grant Permissions") { _, _ ->
-                requestNecessaryPermissions()
-            }
-            .setNegativeButton("Continue Without") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        val prefs = getPreferences(MODE_PRIVATE)
+        val key = "permission_explanation_shown"
+        
+        // Only show the explanation once
+        if (!prefs.getBoolean(key, false)) {
+            // Mark as shown
+            prefs.edit().putBoolean(key, true).apply()
+            
+            // Show a dialog explaining why permissions are needed
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permissions Required")
+                .setMessage("Pizza Planner needs notification and alarm permissions to alert you when it's time to perform recipe steps. Without these permissions, you won't receive timely reminders.")
+                .setPositiveButton("Grant Permissions") { _, _ ->
+                    requestNecessaryPermissions()
+                }
+                .setNegativeButton("Continue Without") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
