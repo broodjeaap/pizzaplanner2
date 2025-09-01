@@ -59,13 +59,13 @@ class ActiveFragment : Fragment() {
     }
     
     private fun loadActiveRecipes() {
-        val activeRecipes = repository.getActiveRecipesList()
+        val allRecipes = repository.getAllRecipesList().sortedByDescending { it.recipe.startTime }
         
-        if (activeRecipes.isEmpty()) {
+        if (allRecipes.isEmpty()) {
             showEmptyState()
         } else {
             showActiveRecipesList()
-            adapter.submitList(activeRecipes)
+            adapter.submitList(allRecipes)
         }
     }
     

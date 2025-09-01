@@ -285,7 +285,7 @@ class PlanningFragment : Fragment() {
             )
             
             // Save to repository
-            plannedRecipeRepository.saveActiveRecipe(
+            plannedRecipeRepository.saveRecipe(
                 plannedRecipe = plannedRecipe,
                 recipeTimeline = timeline,
                 currentStepIndex = 0,

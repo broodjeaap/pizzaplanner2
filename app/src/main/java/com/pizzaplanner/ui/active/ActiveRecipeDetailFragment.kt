@@ -55,7 +55,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         recipeId = arguments?.getString("recipeId") ?: ""
         
         setupClickListeners()
-        loadActiveRecipe()
+        loadRecipe()
         updateUI()
     }
     
@@ -81,8 +81,8 @@ class ActiveRecipeDetailFragment : Fragment() {
         }
     }
     
-    private fun loadActiveRecipe() {
-        activeRecipeData = repository.getActiveRecipe(recipeId)
+    private fun loadRecipe() {
+        activeRecipeData = repository.getRecipe(recipeId)
         
         // Start timer if recipe is in progress and not paused
         activeRecipeData?.let { data ->
@@ -268,7 +268,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         val data = activeRecipeData ?: return
         val newPausedState = !data.isPaused
         
-        repository.updateActiveRecipe(recipeId) { currentData ->
+        repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(isPaused = newPausedState)
         }
         
@@ -278,7 +278,7 @@ class ActiveRecipeDetailFragment : Fragment() {
             startStepTimer()
         }
         
-        loadActiveRecipe()
+        loadRecipe()
         updateUI()
         
         val message = if (newPausedState) "Recipe paused" else "Recipe resumed"
@@ -291,14 +291,14 @@ class ActiveRecipeDetailFragment : Fragment() {
         
         val newStepIndex = data.currentStepIndex + 1
         
-        repository.updateActiveRecipe(recipeId) { currentData ->
+        repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(currentStepIndex = newStepIndex)
         }
         
         if (newStepIndex >= data.timeline.steps.size) {
             completeRecipe()
         } else {
-            loadActiveRecipe()
+            loadRecipe()
             startStepTimer()
             updateUI()
             Toast.makeText(requireContext(), "Step completed!", Toast.LENGTH_SHORT).show()
@@ -330,7 +330,7 @@ class ActiveRecipeDetailFragment : Fragment() {
     private fun cancelRecipe() {
         stepTimer?.cancel()
         
-        repository.updateActiveRecipe(recipeId) { currentData ->
+        repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(status = RecipeStatus.CANCELLED)
         }
         
@@ -341,7 +341,7 @@ class ActiveRecipeDetailFragment : Fragment() {
     private fun completeRecipe() {
         stepTimer?.cancel()
         
-        repository.updateActiveRecipe(recipeId) { currentData ->
+        repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(status = RecipeStatus.COMPLETED)
         }
         
@@ -349,7 +349,6 @@ class ActiveRecipeDetailFragment : Fragment() {
             .setTitle("Recipe Complete!")
             .setMessage("Congratulations! Your pizza dough is ready.")
             .setPositiveButton("Great!") { _, _ ->
-                repository.removeActiveRecipe(recipeId)
                 findNavController().navigateUp()
             }
             .setCancelable(false)

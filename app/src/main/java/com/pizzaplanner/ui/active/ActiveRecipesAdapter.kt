@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.pizzaplanner.R
 import com.pizzaplanner.data.repository.PlannedRecipeRepository.ActiveRecipeData
 import com.pizzaplanner.databinding.ItemActiveRecipeBinding
+import com.pizzaplanner.databinding.ItemInactiveRecipeBinding
 import com.pizzaplanner.data.models.RecipeStatus
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -15,22 +17,51 @@ import java.time.temporal.ChronoUnit
 
 class ActiveRecipesAdapter(
     private val onRecipeClick: (ActiveRecipeData) -> Unit
-) : ListAdapter<ActiveRecipeData, ActiveRecipesAdapter.ActiveRecipeViewHolder>(ActiveRecipeDiffCallback()) {
+) : ListAdapter<ActiveRecipeData, RecyclerView.ViewHolder>(ActiveRecipeDiffCallback()) {
+
+    companion object {
+        private const val VIEW_TYPE_ACTIVE = 0
+        private const val VIEW_TYPE_INACTIVE = 1
+    }
 
     private val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, h:mm a")
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActiveRecipeViewHolder {
-        val binding = ItemActiveRecipeBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ActiveRecipeViewHolder(binding)
+    override fun getItemViewType(position: Int): Int {
+        val item = getItem(position)
+        return when (item.status) {
+            RecipeStatus.IN_PROGRESS, RecipeStatus.SCHEDULED -> VIEW_TYPE_ACTIVE
+            else -> VIEW_TYPE_INACTIVE
+        }
     }
 
-    override fun onBindViewHolder(holder: ActiveRecipeViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_ACTIVE -> {
+                val binding = ItemActiveRecipeBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                ActiveRecipeViewHolder(binding)
+            }
+            else -> {
+                val binding = ItemInactiveRecipeBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                InactiveRecipeViewHolder(binding)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = getItem(position)
+        when (holder) {
+            is ActiveRecipeViewHolder -> holder.bind(item)
+            is InactiveRecipeViewHolder -> holder.bind(item)
+        }
     }
 
     inner class ActiveRecipeViewHolder(
@@ -44,9 +75,7 @@ class ActiveRecipesAdapter(
                 textViewRecipeStatus.text = when (activeRecipe.status) {
                     RecipeStatus.IN_PROGRESS -> if (activeRecipe.isPaused) "Paused" else "In Progress"
                     RecipeStatus.SCHEDULED -> "Scheduled"
-                    RecipeStatus.COMPLETED -> "Completed"
-                    RecipeStatus.CANCELLED -> "Cancelled"
-                    else -> "Unknown"
+                    else -> "Unknown" // Shouldn't happen for active view
                 }
                 
                 // Event name
@@ -123,6 +152,67 @@ class ActiveRecipesAdapter(
                 yesterday -> "Yesterday, ${dateTime.format(timeFormatter)}"
                 else -> dateTime.format(dateTimeFormatter)
             }
+        }
+    }
+
+    inner class InactiveRecipeViewHolder(
+        private val binding: ItemInactiveRecipeBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(recipeData: ActiveRecipeData) {
+        with(binding) {
+            val displayName = if (!recipeData.recipe.eventName.isNullOrEmpty()) {
+                recipeData.recipe.eventName
+            } else {
+                recipeData.recipe.recipeName
+            }
+            textViewRecipeName.text = displayName
+                textViewStatus.text = when (recipeData.status) {
+                    RecipeStatus.COMPLETED -> "Completed"
+                    RecipeStatus.CANCELLED -> "Cancelled"
+                    else -> "Unknown"
+                }
+                
+                // Set different colors based on status
+                when (recipeData.status) {
+                    RecipeStatus.COMPLETED -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_green_dark))
+                    }
+                    RecipeStatus.CANCELLED -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_red_dark))
+                    }
+                    RecipeStatus.SCHEDULED -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
+                    }
+                    RecipeStatus.IN_PROGRESS -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
+                    }
+                    RecipeStatus.PAUSED -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_orange_dark))
+                    }
+                    else -> {
+                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.darker_gray))
+                    }
+                }
+
+                textViewStartTime.text = formatDateTime(recipeData.recipe.startTime)
+                
+                // End time - use last step end time or current time
+                val endTime = if (recipeData.timeline.steps.isNotEmpty()) {
+                    recipeData.timeline.steps.last().endTime ?: LocalDateTime.now()
+                } else {
+                    LocalDateTime.now()
+                }
+                textViewEndTime.text = formatDateTime(endTime)
+
+                root.setOnClickListener {
+                    onRecipeClick(recipeData)
+                }
+            }
+        }
+
+        private fun formatDateTime(dateTime: LocalDateTime): String {
+            return dateTime.format(dateTimeFormatter)
         }
     }
 

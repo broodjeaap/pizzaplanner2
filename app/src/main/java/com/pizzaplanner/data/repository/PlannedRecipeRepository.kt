@@ -26,14 +26,14 @@ class PlannedRecipeRepository(context: Context) {
         private const val KEY_ACTIVE_RECIPES = "active_recipes"
     }
     
-    fun saveActiveRecipe(
+    fun saveRecipe(
         plannedRecipe: PlannedRecipe,
         recipeTimeline: RecipeTimeline,
         currentStepIndex: Int = 0,
         status: RecipeStatus = RecipeStatus.IN_PROGRESS,
         isPaused: Boolean = false
     ) {
-        val activeRecipeData = ActiveRecipeData(
+        val recipeData = ActiveRecipeData(
             recipe = plannedRecipe,
             timeline = recipeTimeline,
             currentStepIndex = currentStepIndex,
@@ -41,20 +41,20 @@ class PlannedRecipeRepository(context: Context) {
             isPaused = isPaused
         )
         
-        val activeRecipes = getActiveRecipesList().toMutableList()
+        val recipes = getAllRecipesList().toMutableList()
         
         // Remove existing recipe with same ID if it exists
-        activeRecipes.removeAll { it.recipe.id == plannedRecipe.id }
+        recipes.removeAll { it.recipe.id == plannedRecipe.id }
         
         // Add new recipe
-        activeRecipes.add(activeRecipeData)
+        recipes.add(recipeData)
         
         // Save updated list
-        val json = gson.toJson(activeRecipes)
+        val json = gson.toJson(recipes)
         sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
     }
     
-    fun getActiveRecipesList(): List<ActiveRecipeData> {
+    fun getAllRecipesList(): List<ActiveRecipeData> {
         val json = sharedPreferences.getString(KEY_ACTIVE_RECIPES, null) ?: return emptyList()
         return try {
             val type = object : TypeToken<List<ActiveRecipeData>>() {}.type
@@ -64,29 +64,29 @@ class PlannedRecipeRepository(context: Context) {
         }
     }
     
-    fun getActiveRecipe(recipeId: String): ActiveRecipeData? {
-        return getActiveRecipesList().find { it.recipe.id == recipeId }
+    fun getRecipe(recipeId: String): ActiveRecipeData? {
+        return getAllRecipesList().find { it.recipe.id == recipeId }
     }
     
-    fun updateActiveRecipe(recipeId: String, updater: (ActiveRecipeData) -> ActiveRecipeData) {
-        val activeRecipes = getActiveRecipesList().toMutableList()
-        val index = activeRecipes.indexOfFirst { it.recipe.id == recipeId }
+    fun updateRecipe(recipeId: String, updater: (ActiveRecipeData) -> ActiveRecipeData) {
+        val recipes = getAllRecipesList().toMutableList()
+        val index = recipes.indexOfFirst { it.recipe.id == recipeId }
         if (index != -1) {
-            activeRecipes[index] = updater(activeRecipes[index])
-            val json = gson.toJson(activeRecipes)
+            recipes[index] = updater(recipes[index])
+            val json = gson.toJson(recipes)
             sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
         }
     }
     
-    fun removeActiveRecipe(recipeId: String) {
-        val activeRecipes = getActiveRecipesList().toMutableList()
-        activeRecipes.removeAll { it.recipe.id == recipeId }
-        val json = gson.toJson(activeRecipes)
+    fun removeRecipe(recipeId: String) {
+        val recipes = getAllRecipesList().toMutableList()
+        recipes.removeAll { it.recipe.id == recipeId }
+        val json = gson.toJson(recipes)
         sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
     }
     
-    fun hasActiveRecipes(): Boolean {
-        return getActiveRecipesList().isNotEmpty()
+    fun hasRecipes(): Boolean {
+        return getAllRecipesList().isNotEmpty()
     }
     
     // Data class for storing active recipe with all its state
