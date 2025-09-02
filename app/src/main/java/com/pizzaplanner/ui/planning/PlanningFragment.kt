@@ -1,12 +1,17 @@
 package com.pizzaplanner.ui.planning
 
+import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +52,19 @@ class PlanningFragment : Fragment() {
     
     private val timeCalculationService = TimeCalculationService()
     private lateinit var plannedRecipeRepository: PlannedRecipeRepository
+    
+    // Permission request launcher
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permission granted, proceed with scheduling alarms
+            Toast.makeText(requireContext(), "Alarm permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            // Permission denied, show explanation
+            Toast.makeText(requireContext(), "Alarms may not work properly without permission", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -282,6 +300,17 @@ class PlanningFragment : Fragment() {
     private fun startRecipe() {
         val recipe = selectedRecipe ?: return
         val targetTime = targetDateTime ?: return
+        
+        // Check for alarm permission on Android 12+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Request permission
+                requestPermissionLauncher.launch(android.Manifest.permission.SCHEDULE_EXACT_ALARM)
+                Toast.makeText(requireContext(), "Please grant alarm permission to schedule recipe steps", Toast.LENGTH_LONG).show()
+                return
+            }
+        }
         
         try {
             val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
