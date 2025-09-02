@@ -341,7 +341,6 @@ class PlanningFragment : Fragment() {
             )
             
             // Schedule alarms for recipe steps
-            val alarmService = AlarmService(requireContext())
             val alarmEvents = timeline.steps.map { step ->
                 AlarmEvent(
                     id = "${plannedRecipe.id}_${step.step.id}",
@@ -351,7 +350,7 @@ class PlanningFragment : Fragment() {
                     alarmType = AlarmType.NOTIFICATION
                 )
             }
-            alarmService.scheduleMultipleAlarms(alarmEvents)
+            AlarmService.scheduleMultipleAlarms(requireContext(), alarmEvents)
             
             Toast.makeText(requireContext(), "Recipe started! Check the Active tab.", Toast.LENGTH_LONG).show()
             

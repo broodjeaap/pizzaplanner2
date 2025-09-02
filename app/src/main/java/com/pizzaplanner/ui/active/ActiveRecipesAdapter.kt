@@ -16,7 +16,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 class ActiveRecipesAdapter(
-    private val onRecipeClick: (ActiveRecipeData) -> Unit
+    private val onRecipeClick: (ActiveRecipeData) -> Unit,
+    private val onRecipeLongClick: (ActiveRecipeData) -> Boolean = { false }
 ) : ListAdapter<ActiveRecipeData, RecyclerView.ViewHolder>(ActiveRecipeDiffCallback()) {
 
     companion object {
@@ -137,6 +138,11 @@ class ActiveRecipesAdapter(
                 root.setOnClickListener {
                     onRecipeClick(activeRecipe)
                 }
+                
+                // Long click listener
+                root.setOnLongClickListener {
+                    onRecipeLongClick(activeRecipe)
+                }
             }
         }
 
@@ -218,6 +224,11 @@ class ActiveRecipesAdapter(
 
                 root.setOnClickListener {
                     onRecipeClick(recipeData)
+                }
+                
+                // Long click listener
+                root.setOnLongClickListener {
+                    onRecipeLongClick(recipeData)
                 }
             }
         }

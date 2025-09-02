@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
 import com.pizzaplanner.data.repository.PlannedRecipeRepository
+import com.pizzaplanner.data.repository.PlannedRecipeRepository.ActiveRecipeData
 import com.pizzaplanner.databinding.FragmentActiveListBinding
 
 class ActiveFragment : Fragment() {
@@ -37,10 +40,17 @@ class ActiveFragment : Fragment() {
     }
     
     private fun setupRecyclerView() {
-        adapter = ActiveRecipesAdapter { activeRecipeData ->
-            // Navigate to detailed view for this specific recipe
-            navigateToRecipeDetail(activeRecipeData.recipe.id)
-        }
+        adapter = ActiveRecipesAdapter(
+            onRecipeClick = { activeRecipeData ->
+                // Navigate to detailed view for this specific recipe
+                navigateToRecipeDetail(activeRecipeData.recipe.id)
+            },
+            onRecipeLongClick = { activeRecipeData ->
+                // Show delete confirmation dialog
+                showDeleteConfirmationDialog(activeRecipeData)
+                true // Return true to indicate the long press was handled
+            }
+        )
         
         binding.recyclerViewActiveRecipes.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -83,6 +93,21 @@ class ActiveFragment : Fragment() {
         super.onResume()
         // Refresh the list when coming back to this fragment
         loadActiveRecipes()
+    }
+    
+    private fun showDeleteConfirmationDialog(activeRecipeData: ActiveRecipeData) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete Recipe")
+            .setMessage("Are you sure you want to delete '${activeRecipeData.recipe.recipeName}'? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                // Delete the recipe
+                repository.removeRecipe(activeRecipeData.recipe.id)
+                // Refresh the list
+                loadActiveRecipes()
+                Toast.makeText(requireContext(), "Recipe deleted", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     override fun onDestroyView() {
