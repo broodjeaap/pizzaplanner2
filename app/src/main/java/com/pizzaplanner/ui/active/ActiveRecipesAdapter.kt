@@ -110,7 +110,7 @@ class ActiveRecipesAdapter(
                             try {
                                 val timeRemaining = ChronoUnit.MINUTES.between(now, stepEndTime)
                                 if (timeRemaining > 0) {
-                                    textViewStepTimer.text = "${timeRemaining}m remaining"
+                                    textViewStepTimer.text = formatTimeRemaining(timeRemaining)
                                     textViewStepTimer.visibility = android.view.View.VISIBLE
                                 } else {
                                     textViewStepTimer.visibility = android.view.View.GONE
@@ -151,6 +151,17 @@ class ActiveRecipesAdapter(
                 tomorrow -> "Tomorrow, ${dateTime.format(timeFormatter)}"
                 yesterday -> "Yesterday, ${dateTime.format(timeFormatter)}"
                 else -> dateTime.format(dateTimeFormatter)
+            }
+        }
+        
+        private fun formatTimeRemaining(minutes: Long): String {
+            return when {
+                minutes >= 60 -> {
+                    val hours = minutes / 60
+                    val remainingMinutes = minutes % 60
+                    "${hours}h ${remainingMinutes}m remaining"
+                }
+                else -> "${minutes}m remaining"
             }
         }
     }

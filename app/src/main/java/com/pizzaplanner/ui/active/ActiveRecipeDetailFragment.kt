@@ -182,8 +182,7 @@ class ActiveRecipeDetailFragment : Fragment() {
             val timeUntilNext = ChronoUnit.MINUTES.between(LocalDateTime.now(), startTime)
             binding.textViewNextStepTime.text = when {
                 timeUntilNext <= 0 -> "Ready to start"
-                timeUntilNext < 60 -> "Starts in ${timeUntilNext}m"
-                else -> "Starts in ${timeUntilNext / 60}h ${timeUntilNext % 60}m"
+                else -> "Starts in ${formatTimeRemaining(timeUntilNext)}"
             }
         } catch (e: Exception) {
             binding.textViewNextStepTime.text = "Ready to start"
@@ -209,8 +208,7 @@ class ActiveRecipeDetailFragment : Fragment() {
                 val timeRemaining = ChronoUnit.MINUTES.between(now, targetTime)
                 binding.textViewTimeRemaining.text = when {
                     timeRemaining <= 0 -> "Ready!"
-                    timeRemaining < 60 -> "${timeRemaining}m remaining"
-                    else -> "${timeRemaining / 60}h ${timeRemaining % 60}m remaining"
+                    else -> "${formatTimeRemaining(timeRemaining)} remaining"
                 }
             } catch (e: Exception) {
                 binding.textViewTimeRemaining.text = "Time calculation error"
@@ -259,9 +257,27 @@ class ActiveRecipeDetailFragment : Fragment() {
             return
         }
         
-        val minutes = (stepTimeRemainingMs / 1000 / 60).toInt()
-        val seconds = ((stepTimeRemainingMs / 1000) % 60).toInt()
-        binding.textViewStepTimer.text = String.format("%02d:%02d", minutes, seconds)
+        val totalSeconds = stepTimeRemainingMs / 1000
+        val hours = (totalSeconds / 3600).toInt()
+        val minutes = ((totalSeconds % 3600) / 60).toInt()
+        val seconds = (totalSeconds % 60).toInt()
+        
+        if (hours > 0) {
+            binding.textViewStepTimer.text = String.format("%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            binding.textViewStepTimer.text = String.format("%02d:%02d", minutes, seconds)
+        }
+    }
+    
+    private fun formatTimeRemaining(minutes: Long): String {
+        return when {
+            minutes >= 60 -> {
+                val hours = minutes / 60
+                val remainingMinutes = minutes % 60
+                "${hours}h ${remainingMinutes}m"
+            }
+            else -> "${minutes}m"
+        }
     }
     
     private fun togglePauseResume() {
