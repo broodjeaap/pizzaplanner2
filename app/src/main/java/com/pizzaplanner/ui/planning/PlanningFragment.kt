@@ -137,7 +137,7 @@ class PlanningFragment : Fragment() {
     private fun showRecipeSelectionDialog() {
         lifecycleScope.launch {
             try {
-                val inputStream = requireContext().assets.open("recipes/pizza_recipes.yaml")
+                val inputStream = requireContext().assets.open("recipes/pizza_recipes_converted.yaml")
                 val recipes = YamlParser().parseRecipes(inputStream)
                 val recipeNames = recipes.map { it.name }.toTypedArray()
                 
@@ -148,7 +148,8 @@ class PlanningFragment : Fragment() {
                     }
                     .show()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading recipes", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error loading recipes: ${e.message}", Toast.LENGTH_LONG).show()
+                e.printStackTrace()
             }
         }
     }

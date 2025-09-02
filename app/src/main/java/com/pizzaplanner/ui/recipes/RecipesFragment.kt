@@ -84,12 +84,13 @@ class RecipesFragment : Fragment() {
 
     private fun loadRecipes() {
         try {
-            val inputStream = requireContext().assets.open("recipes/pizza_recipes.yaml")
+            val inputStream = requireContext().assets.open("recipes/pizza_recipes_converted.yaml")
             val yamlParser = YamlParser()
             val recipes = yamlParser.parseRecipes(inputStream)
             viewModel.setRecipes(recipes)
         } catch (e: Exception) {
             viewModel.setError("Failed to load recipes: ${e.message}")
+            e.printStackTrace()
         }
     }
 

@@ -1,0 +1,361 @@
+recipes:
+  - id: "beginner_poolish"
+    name: "Beginner Poolish"
+    description: "A Neapolitan Style pizza with a two cold rises, first as a 'poolish', then again as the complete dough. This version of the poolish recipe has fewer steps and a slightly lower hydration for easier handling.\n\nThe recipe is based on this excellent video from Vito Lacopelli: [HOW TO MAKE NEXT LEVEL PIZZA DOUGH | DOUBLE FERMENTED + POOLISH | Vito Iacopelli](https://www.youtube.com/watch?v=n1O3uHPCOLA)"
+    difficulty: "Medium"
+    total_time_hours: 48
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza.png"
+    variables:
+      - name: "poolish_rise_hours"
+        display: "Poolish Cold Rise (hours)"
+        default: 20
+        min: 16
+        max: 24
+        type: "integer"
+        unit: "hours"
+      - name: "dough_cold_rise_hours"
+        display: "Dough Cold Rise (hours)"
+        default: 20
+        min: 16
+        max: 24
+        type: "integer"
+        unit: "hours"
+      - name: "room_temp_rise_minutes"
+        display: "Room Temperature Rise (minutes)"
+        default: 45
+        min: 30
+        max: 60
+        type: "integer"
+        unit: "minutes"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    steps:
+      - id: "make_poolish"
+        name: "Make the poolish"
+        description: "Combine the poolish flour, poolish water, honey and yeast to create the poolish."
+        duration_minutes: 15
+        timing: "start"
+        notes: "See video: [Make to poolish](https://youtu.be/u7Hd6ZzKgBM?t=97)"
+      - id: "poolish_cold_rise"
+        name: "Poolish cold rise"
+        description: "Let the poolish cold rise for {poolish_rise_hours} hours"
+        duration_formula: "poolish_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Cold (refrigerator)"
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine the rest of the ingredients to create turn the poolish into a dough."
+        duration_minutes: 30
+        timing: "after_previous"
+        notes: "See video: [Make to dough](https://youtu.be/u7Hd6ZzKgBM?t=199)"
+      - id: "dough_cold_rise"
+        name: "Dough cold rise"
+        description: "Let the dough cold rise for {dough_cold_rise_hours} hours"
+        duration_formula: "dough_cold_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Cold (refrigerator)"
+      - id: "room_temp"
+        name: "Room temperature rise"
+        description: "Take the dough out of the fridge to let it come to room temperature"
+        duration_formula: "room_temp_rise_minutes"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller dough balls"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "See video: [Making dough balls](https://youtu.be/u7Hd6ZzKgBM?t=675)"
+      - id: "dough_ball_rise"
+        name: "Dough ball rise"
+        description: "Let the dough balls rise for {dough_ball_rise_hours} hours"
+        duration_formula: "dough_ball_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "pizza_time"
+        name: "Pizza Time!"
+        description: "Time to make your poolish pizza!"
+        duration_minutes: 0
+        timing: "after_previous"
+
+  - id: "poolish_double_rise"
+    name: "Poolish Double Rise"
+    description: "A Neapolitan Style pizza with a two cold rises, first as a 'poolish', then again as the complete dough. This dough has many steps, but the end result is definitely worth the extra effort.\n\nThe recipe is based on this excellent video from Vito Lacopelli: [HOW TO MAKE NEXT LEVEL PIZZA DOUGH | DOUBLE FERMENTED + POOLISH | Vito Iacopelli](https://www.youtube.com/watch?v=n1O3uHPCOLA)"
+    difficulty: "Hard"
+    total_time_hours: 72
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza.png"
+    variables:
+      - name: "poolish_warm_rise_minutes"
+        display: "Poolish Warm Rise (minutes)"
+        default: 45
+        min: 30
+        max: 60
+        type: "integer"
+        unit: "minutes"
+      - name: "poolish_cold_rise_hours"
+        display: "Poolish Cold Rise (hours)"
+        default: 20
+        min: 16
+        max: 24
+        type: "integer"
+        unit: "hours"
+      - name: "poolish_room_temp_minutes"
+        display: "Poolish Room Temperature (minutes)"
+        default: 45
+        min: 30
+        max: 60
+        type: "integer"
+        unit: "minutes"
+      - name: "gluten_development_minutes"
+        display: "Gluten Development (minutes)"
+        default: 20
+        min: 15
+        max: 30
+        type: "integer"
+        unit: "minutes"
+      - name: "second_cold_rise_hours"
+        display: "Second Cold Rise (hours)"
+        default: 20
+        min: 16
+        max: 24
+        type: "integer"
+        unit: "hours"
+      - name: "final_room_temp_minutes"
+        display: "Final Room Temperature (minutes)"
+        default: 30
+        min: 15
+        max: 60
+        type: "integer"
+        unit: "minutes"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    steps:
+      - id: "make_poolish"
+        name: "Make the Poolish"
+        description: "Combine the poolish flour, poolish water, honey and yeast to create the poolish."
+        duration_formula: "poolish_warm_rise_minutes"
+        timing: "start"
+        notes: "See video: [Make to poolish](https://youtu.be/u7Hd6ZzKgBM?t=97)"
+      - id: "poolish_fridge"
+        name: "Poolish Fridge"
+        description: "Transfer the poolish to the fridge for an overnight cold rise"
+        duration_formula: "poolish_cold_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Cold (refrigerator)"
+      - id: "poolish_room_temp"
+        name: "Poolish room temperature"
+        description: "Take the poolish out of the fridge and let it rest come up to room temperature"
+        duration_formula: "poolish_room_temp_minutes"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "make_poolish_dough"
+        name: "Make the poolish dough"
+        description: "Combine the rest of the ingredients to create turn the poolish into a dough."
+        duration_formula: "gluten_development_minutes"
+        timing: "after_previous"
+        notes: "See video: [Make to dough](https://youtu.be/u7Hd6ZzKgBM?t=199)"
+      - id: "second_cold_rise"
+        name: "Second cold rise"
+        description: "Add a little bit of olive oil to a big bowl, coating all sides, then transfer your kneaded dough then put it in the fridge for the second cold rise"
+        duration_formula: "second_cold_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Cold (refrigerator)"
+      - id: "final_room_temp"
+        name: "Before making the dough balls"
+        description: "Take the dough out of the fridge to let it come to room temperature before making the dough balls"
+        duration_formula: "final_room_temp_minutes"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller dough balls"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "See video: [Making dough balls](https://youtu.be/u7Hd6ZzKgBM?t=675)"
+      - id: "dough_ball_rise"
+        name: "Dough ball rise"
+        description: "Let the dough balls rise for {dough_ball_rise_hours} hours"
+        duration_formula: "dough_ball_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "pizza_time"
+        name: "Pizza Time!"
+        description: "Time to make your poolish pizza!"
+        duration_minutes: 0
+        timing: "after_previous"
+
+  - id: "neapolitan_day_dough"
+    name: "Neapolitan Day Dough"
+    description: "A Neapolitan Style pizza prepared in a day."
+    difficulty: "Easy"
+    total_time_hours: 8
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png"
+    variables:
+      - name: "room_temp_rise_hours"
+        display: "Room Temperature Rise (hours)"
+        default: 5
+        min: 4
+        max: 6
+        type: "integer"
+        unit: "hours"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    steps:
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast."
+        duration_formula: "room_temp_rise_hours * 60"
+        timing: "start"
+        notes: "See videos: [Pizza Dough | Basics with Babish](https://www.youtube.com/watch?v=n1O3uHPCOLA) and [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller dough balls and place the dough in a sealed/covered container at room temperature"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "See video: [How to make dough balls](https://www.youtube.com/watch?v=oZxNbL5XB7w)"
+      - id: "dough_ball_rise"
+        name: "Dough ball rise"
+        description: "Let the dough balls rise for {dough_ball_rise_hours} hours"
+        duration_formula: "dough_ball_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "pizza_time"
+        name: "Pizza Time!"
+        description: "Time to make pizza!"
+        duration_minutes: 0
+        timing: "after_previous"
+
+  - id: "neapolitan_cold_rise"
+    name: "Neapolitan Cold Rise"
+    description: "A Neapolitan Style pizza with a multi day cold rise, giving a light and fluffy dough."
+    difficulty: "Medium"
+    total_time_hours: 72
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza.png"
+    variables:
+      - name: "cold_rise_days"
+        display: "Cold Rise (days)"
+        default: 3
+        min: 1
+        max: 5
+        type: "integer"
+        unit: "days"
+      - name: "room_temp_rise_hours"
+        display: "Room Temperature Rise (hours)"
+        default: 4
+        min: 3
+        max: 6
+        type: "integer"
+        unit: "hours"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    steps:
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast."
+        duration_formula: "cold_rise_days * 24 * 60"
+        timing: "start"
+        temperature: "Cold (refrigerator)"
+        notes: "See videos: [Pizza Dough | Basics with Babish](https://www.youtube.com/watch?v=n1O3uHPCOLA) and [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)"
+      - id: "room_temp_rise"
+        name: "Warm rise"
+        description: "Take the dough out of the fridge and let it come to room temperature for a final rise before baking"
+        duration_formula: "room_temp_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller balls and place them into a covered/sealed container(s)"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "See video: [How to Make PIZZA DOUGH BALLS like a World Best Pizza Chef](https://www.youtube.com/watch?v=oZxNbL5XB7w)"
+      - id: "dough_ball_rise"
+        name: "Dough ball rise"
+        description: "Let the dough balls rise for {dough_ball_rise_hours} hours"
+        duration_formula: "dough_ball_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "pizza_time"
+        name: "Pizza Time!"
+        description: "Time to make pizza!"
+        duration_minutes: 0
+        timing: "after_previous"
+
+  - id: "new_york_dough"
+    name: "New York Dough"
+    description: "A New York style dough, a thin flavourful crust. Pretty much copied from [Joshua Weissman's excellent recipe](https://www.joshuaweissman.com/post/real-new-york-style-pizza-at-home), so check that out for a more in-depth recipe."
+    difficulty: "Medium"
+    total_time_hours: 48
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png"
+    variables:
+      - name: "cold_rise_days"
+        display: "Cold Rise (days)"
+        default: 2
+        min: 1
+        max: 3
+        type: "integer"
+        unit: "days"
+      - name: "room_temp_rise_hours"
+        display: "Room Temperature Rise (hours)"
+        default: 4
+        min: 3
+        max: 6
+        type: "integer"
+        unit: "hours"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    steps:
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine all the dry ingredients in a bowl, and add the yeast to the (lukewarm) water. Then add the water with the yeast to the dry ingredients and mix by hand"
+        duration_formula: "cold_rise_days * 24 * 60"
+        timing: "start"
+        temperature: "Cold (refrigerator)"
+        notes: "See [Joshua Weissman's excellent recipe](https://www.joshuaweissman.com/post/real-new-york-style-pizza-at-home) for more details"
+      - id: "room_temp_rise"
+        name: "Warm rise"
+        description: "Take the dough out of the fridge and let it come to room temperature for a final rise before baking"
+        duration_formula: "room_temp_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller balls and place them into a covered/sealed container(s)"
+        duration_minutes: 15
+        timing: "after_previous"
+        notes: "See video: [How to Make PIZZA DOUGH BALLS like a World Best Pizza Chef](https://www.youtube.com/watch?v=oZxNbL5XB7w)"
+      - id: "dough_ball_rise"
+        name: "Dough ball rise"
+        description: "Let the dough balls rise for {dough_ball_rise_hours} hours"
+        duration_formula: "dough_ball_rise_hours * 60"
+        timing: "after_previous"
+        temperature: "Room temperature"
+      - id: "pizza_time"
+        name: "Pizza Time!"
+        description: "Time to make pizza!"
+        duration_minutes: 0
+        timing: "after_previous"

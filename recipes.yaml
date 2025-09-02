@@ -1,0 +1,436 @@
+recipes:
+  - name: "Beginner Poolish"
+    image: https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza.png
+    description: >
+      A Neapolitan Style pizza with a two cold rises, first as a 'poolish', then again as the complete dough.  
+      This version of the poolish recipe has fewer steps and a slightly lower hydration for easier handling.
+
+      The recipe is based on this excelent video from Vito Lacopelli:  
+      [HOW TO MAKE NEXT LEVEL PIZZA DOUGH | DOUBLE FERMENTED + POOLISH | Vito Iacopelli](https://www.youtube.com/watch?v=n1O3uHPCOLA)  
+      
+      ![cold_dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza2.png)
+    ingredients:
+      - name: Poolish Flour
+        unit: g
+        value: 0.171919
+      - name: Poolish Water
+        unit: ml
+        value: 0.171919
+      - name: Honey
+        unit: g
+        value: 0.002865
+      - name: Yeast
+        unit: g
+        value: 0.002865
+      - name: Flour
+        unit: g
+        value: 0.446146
+      - name: Water
+        unit: ml
+        value: 0.184226
+      - name: Salt
+        unit: g
+        value: 0.014326
+      - name: Olive Oil
+        unit: ml
+        value: 0.005730
+    steps:           
+      - name: Make the poolish
+        wait:
+          description: How many hours of poolish cold rise?
+          unit: hours
+          min: 16
+          max: 24
+        description: >
+          Combine the poolish flour, poolish water, honey and yeast to create the poolish.  
+
+          [Make to poolish](https://youtu.be/u7Hd6ZzKgBM?t=97)
+        substeps:
+          - name: Flour + Yeast
+            description: >
+              Combine the flour and yeast and mix.
+          - name: The rest
+            description: >
+              Add the honey to the water in your mixing bowl, add in the flour/yeast mix and thoroughly combine until it's a homogeneous (ver sticky) dough.        
+      - name: Make the dough
+        wait:
+          description: How many hours of dough cold rise?
+          unit: hours
+          min: 16
+          max: 24
+        description: >
+          Combine the rest of the ingredients to create turn the poolish into a dough.  
+
+          [Make to dough](https://youtu.be/u7Hd6ZzKgBM?t=199)
+        substeps:
+          - name: Poolish + water
+            description: >
+              Add the water to the poolish, thoroughly mixing so that most of the poolish is dissolved into the water.
+          - name: Salt+Oil
+            description: >
+              Add the Salt and oil to the poolish.
+          - name: Flour and Kneading
+            description: >
+              Add the flour to the poolish.  
+              If you don't have a dough mixer, you can use a spoon to mix everything together at first, then switch to your hands.
+              This is a VERY sticky dough, don't be discouraged, keep going for 10-15 minutes.  
+          - name: Prepare for gluten development
+            description: >
+              Cover the dough or place it in a bowl you can cover to let it rest for a short time.
+      - name: Before making the dough balls
+        wait:
+          description: How long to let the dough come to room temperature?
+          unit: minutes
+          min: 30
+          max: 60
+        description: >
+          Take the dough out of the fridge to let it come to room temperature before making the dough balls.
+      - name: Making the dough balls
+        wait:
+          description: How many hours of room temperature rise?
+          unit: hours
+          min: 1
+          max: 4
+        description: >
+          Split the dough into smaller dough balls.  
+
+          [Making dough balls](https://youtu.be/u7Hd6ZzKgBM?t=675)
+      - name: Pizza Time!
+        description: >
+          Time to make your poolish pizza!
+  - name: "Poolish Double Rise"
+    image: https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza.png
+    description: >
+      A Neapolitan Style pizza with a two cold rises, first as a 'poolish', then again as the complete dough.  
+      This dough has many steps, but the end result is definitely worth the extra effort.  
+
+      The recipe is based on this excelent video from Vito Lacopelli:  
+      [HOW TO MAKE NEXT LEVEL PIZZA DOUGH | DOUBLE FERMENTED + POOLISH | Vito Iacopelli](https://www.youtube.com/watch?v=n1O3uHPCOLA)  
+      
+      ![cold_dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_poolish_pizza2.png)
+    ingredients:
+      - name: Poolish Flour
+        unit: g
+        value: 0.171919
+      - name: Poolish Water
+        unit: ml
+        value: 0.171919
+      - name: Honey
+        unit: g
+        value: 0.002865
+      - name: Yeast
+        unit: g
+        value: 0.002865
+      - name: Flour
+        unit: g
+        value: 0.421146
+      - name: Water
+        unit: ml
+        value: 0.209226
+      - name: Salt
+        unit: g
+        value: 0.014326
+      - name: Olive Oil
+        unit: ml
+        value: 0.005730
+    steps:
+      - name: Make the Poolish
+        wait:
+          description: How many minutes warm poolish rise?
+          unit: minutes
+          min: 30
+          max: 60
+        description: >
+          Combine the poolish flour, poolish water, honey and yeast to create the poolish.  
+
+          [Make to poolish](https://youtu.be/u7Hd6ZzKgBM?t=97)
+        substeps:
+          - name: Flour + Yeast
+            description: >
+              Combine the flour and yeast and mix.
+          - name: The rest
+            description: >
+              Add the honey to the water in your mixing bowl, add in the flour/yeast mix and thoroughly combine until it's a homogeneous (ver sticky) dough.               
+      - name: Poolish Fridge
+        wait:
+          description: How many hours of poolish cold rise?
+          unit: hours
+          min: 16
+          max: 24
+        description: >
+          Transfer the poolish to the fridge for an overnight cold rise.
+      - name: Poolish room temperature
+        wait:
+          description: How long to let the dough come to room temperature?
+          unit: minutes
+          min: 30
+          max: 60
+        description: >
+          Take the poolish out of the fridge and let it rest come up to room temperature.
+      - name: Make the poolish dough
+        wait:
+          description: How many minutes for the gluten development?
+          unit: minutes
+          min: 15
+          max: 30
+        description: >
+          Combine the rest of the ingredients to create turn the poolish into a dough.  
+
+          [Make to dough](https://youtu.be/u7Hd6ZzKgBM?t=199)
+        substeps:
+          - name: Poolish + water
+            description: >
+              Add the water to the poolish, thoroughly mixing so that most of the poolish is dissolved into the water.
+          - name: Salt+Oil
+            description: >
+              Add the Salt and oil to the poolish.
+          - name: Flour and Kneading
+            description: >
+              Add the flour to the poolish.  
+              If you don't have a dough mixer, you can use a spoon to mix everything together at first, then switch to your hands.
+              This is a VERY sticky dough, don't be discouraged, keep going for 10-15 minutes.  
+          - name: Prepare for gluten development
+            description: >
+              Cover the dough or place it in a bowl you can cover to let it rest for a short time.
+      - name: Second cold rise
+        wait:
+          description: How many hours of cold rise?
+          unit: hours
+          min: 16
+          max: 24
+        description: >
+          Add a little bit of olive oil to a big bowl, coating all sides, then transfer your kneaded dough then put it in the fridge for the second cold rise.
+      - name: Before making the dough balls
+        wait:
+          description: How long to let the dough come to room temperature?
+          unit: minutes
+          min: 15
+          max: 60
+        description: >
+          Take the dough out of the fridge to let it come to room temperature before making the dough balls.
+      - name: Making the dough balls
+        wait:
+          description: How many hours of room temperature rise?
+          unit: hours
+          min: 1
+          max: 4
+        description: >
+          Split the dough into smaller dough balls.  
+
+          [Making dough balls](https://youtu.be/u7Hd6ZzKgBM?t=675)
+      - name: Pizza Time!
+        description: >
+          Time to make your poolish pizza!
+  - name: "Neapolitan Day Dough"
+    image: https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png
+    description: >
+      A Neapolitan Style pizza prepared in a day.  
+
+      ![cold_dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png)
+    ingredients:
+      - name: flour
+        unit: g
+        value: 0.596
+      - name: water
+        unit: ml
+        value: 0.366
+      - name: salt
+        unit: g
+        value: 0.018
+      - name: yeast
+        unit: g
+        value: 0.02
+    steps:
+      - name: Make the dough
+        wait:
+          description: How many hours of room temperature rise?
+          unit: hours
+          min: 4
+          max: 6
+        description: >
+          Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast.
+        substeps:
+          - name: Salt+Water
+            description: >
+              Combine the salt and the water in a bowl, stir until the salt dissolves.  
+              ![saltwater](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_saltwater.png)
+          - name: +20% flour
+            description: >
+              Add ~20% of the flour to the water/salt mixture and mix everything together.  
+              ![flour20](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pre_yeast.png)
+          - name: Yeast
+            description: >
+              Add the yeast to the mixture.
+              ![yeast](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_yeast.png)
+          - name: Flour
+            description: >
+              Add the rest of the flour to the mixture, knead the dough for 15-20 minutes.  
+              You can knead the dough with your hands, use a stand mixer or a food processor.  
+
+              [Kneading by hand.](https://www.youtube.com/watch?v=l9avZp3xFNU)  
+
+              The result should look something like this:  
+
+              ![dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_dough.png)
+
+          - name: Rise
+            description: >
+              Split the dough into doughballs and place the dough in a sealed/covered container at room temperature.  
+
+              [How to make dough balls](https://www.youtube.com/watch?v=oZxNbL5XB7w)
+      - name: Pizza Time!
+        description: >
+          Time to make pizza!
+  - name: "Neapolitan Cold Rise"
+    image: https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza.png
+    description: >
+      A Neapolitan Style pizza with a multi day cold rise, giving a light and fluffy dough.
+
+      ![cold_dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza.png)
+    ingredients:
+      - name: flour
+        unit: g
+        value: 0.595
+      - name: water
+        unit: ml
+        value: 0.386
+      - name: salt
+        unit: g
+        value: 0.0178
+      - name: yeast
+        unit: g
+        value: 0.0012
+    steps:
+      - name: Make the dough
+        wait:
+          description: How many days cold rise?
+          unit: days
+          min: 1
+          max: 5
+        description: >
+          Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast.
+
+          Check these youtube videos for more info:  
+          
+          [Pizza Dough | Basics with Babish](https://www.youtube.com/watch?v=n1O3uHPCOLA)  
+
+          [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)
+
+        substeps:
+          - name: Salt+Water
+            description: >
+              Combine the salt and the water in a bowl, stir until the salt dissolves.
+
+              ![salt_water](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_salt_water.png)
+          - name: +20% flour
+            description: >
+              Add ~20% of the flour to the water/salt mixture and mix everything together.
+
+              ![pre_yeast](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pre_yeast.png)
+          - name: Yeast
+            description: >
+              Add the yeast to the mixture.
+
+              ![yeast](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_yeast.png)
+          - name: Flour
+            description: >
+              Add the rest of the flour to the mixture, knead the dough for 15-20 minutes.  
+
+              You can use a mixer, or do it by hand, see [this video](https://www.youtube.com/watch?v=l9avZp3xFNU) for in depth instructions on kneading by hand.
+
+              ![kneaded](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_kneaded.png)
+          - name: Fridge
+            description: >
+              Place the dough in a sealed/covered container in the fridge.  
+
+              ![kneaded](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_fridge.png)
+      - name: Warm rise
+        wait:
+          description: How many hours of room temperature rise?
+          unit: hours
+          min: 3
+          max: 6
+        description: >
+          Take the dough out of the fridge and let it come to room temperature for a final rise before baking
+        substeps:
+          - name: Split
+            description: >
+              Split the dough into smaller balls and place them into a covered/sealed container(s)
+              
+              For video instructions on how to make Dough balls check out this video:  
+
+              [How to Make PIZZA DOUGH BALLS like a World Best Pizza Chef](https://www.youtube.com/watch?v=oZxNbL5XB7w)
+
+              ![kneaded](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_ball.png)
+      - name: Pizza Time!
+        description: >
+          Time to make pizza!
+          ![pizza](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza2.png)
+  - name: "New York Dough"
+    image: https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png
+    description: >
+      A New York style dough, a thin flavourful crust.  
+      Pretty much copied from [Joshua Weissman's exelent recipe](https://www.joshuaweissman.com/post/real-new-york-style-pizza-at-home), so check that out for a more in-depth recipe.     
+
+      ![cold_dough](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png)
+    ingredients:
+      - name: flour
+        unit: g
+        value: 0.584615385
+      - name: water
+        unit: ml
+        value: 0.379692308
+      - name: salt
+        unit: g
+        value: 0.011692308
+      - name: yeast
+        unit: g
+        value: 0.008615385
+      - name: sugar
+        unit: g
+        value: 0.015384615
+    steps:
+      - name: Make the dough
+        wait:
+          description: How many days cold rise?
+          unit: days
+          min: 1
+          max: 3
+        description: >
+          Combine all the dry ingredients in a bowl, and add the yeast to the (lukewarm) water.  
+          Then add the water with the yeast to the dry ingredients and mix by hand
+        substeps:
+          - name: Dry
+            description: >
+              Combine the flour, salt and sugar in a bowl
+          - name: Water+yeast
+            description: >
+              Add the yeast to the (warm) water and let it sit for a while.
+          - name: Yeast
+            description: >
+              Add the water (with yeast) to the dry ingredients and mix everything until you have smooth dough.
+          - name: Fridge
+            description: >
+              Transfer the dough to a different bowl with some olive oil, and place in the fridge.
+      - name: Warm rise
+        wait:
+          description: How many hours of room temperature rise?
+          unit: hours
+          min: 3
+          max: 6
+        description: >
+          Take the dough out of the fridge and let it come to room temperature for a final rise before baking
+        substeps:
+          - name: Split
+            description: >
+              Split the dough into smaller balls and place them into a covered/sealed container(s)
+              
+              For video instructions on how to make Dough balls check out this video:  
+
+              [How to Make PIZZA DOUGH BALLS like a World Best Pizza Chef](https://www.youtube.com/watch?v=oZxNbL5XB7w)
+
+              ![kneaded](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_ball.png)
+      - name: Pizza Time!
+        description: >
+          Time to make pizza!
+          ![pizza](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza2.png)
