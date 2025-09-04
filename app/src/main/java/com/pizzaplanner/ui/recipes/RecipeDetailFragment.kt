@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
 import com.pizzaplanner.databinding.FragmentRecipeDetailBinding
@@ -55,6 +57,17 @@ class RecipeDetailFragment : Fragment() {
                 else -> android.R.color.darker_gray
             }
             textViewDifficulty.setTextColor(requireContext().getColor(difficultyColor))
+            
+            // Load recipe image if available
+            if (recipe.imageUrl != null && recipe.imageUrl.isNotEmpty()) {
+                imageViewRecipe.visibility = View.VISIBLE
+                Glide.with(requireContext())
+                    .load(recipe.imageUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageViewRecipe)
+            } else {
+                imageViewRecipe.visibility = View.GONE
+            }
         }
     }
 

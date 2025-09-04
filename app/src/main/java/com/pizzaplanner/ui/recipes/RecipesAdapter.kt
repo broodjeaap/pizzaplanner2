@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
 import com.pizzaplanner.databinding.ItemRecipeBinding
@@ -55,6 +57,17 @@ class RecipesAdapter(
                 // Show variable count
                 textViewVariables.text = "${recipe.variables.size} customizable variables"
                 textViewSteps.text = "${recipe.steps.size} steps"
+                
+                // Load recipe image if available
+                if (recipe.imageUrl != null && recipe.imageUrl.isNotEmpty()) {
+                    imageViewRecipe.visibility = android.view.View.VISIBLE
+                    Glide.with(root.context)
+                        .load(recipe.imageUrl)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(imageViewRecipe)
+                } else {
+                    imageViewRecipe.visibility = android.view.View.GONE
+                }
 
                 root.setOnClickListener {
                     onRecipeClick(recipe)
