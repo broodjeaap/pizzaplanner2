@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.data.models.RecipeStep
 import com.pizzaplanner.data.models.StepTiming
 import com.pizzaplanner.databinding.ItemRecipeStepBinding
+import com.pizzaplanner.utils.MarkdownUtils
 
 class RecipeStepsAdapter : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHolder>(StepDiffCallback()) {
 
@@ -32,7 +33,7 @@ class RecipeStepsAdapter : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHo
             binding.apply {
                 textViewStepNumber.text = stepNumber.toString()
                 textViewStepTitle.text = step.name
-                textViewStepDescription.text = step.description
+                MarkdownUtils.setMarkdownText(textViewStepDescription, step.description)
                 textViewStepTiming.text = when (step.timing) {
                     StepTiming.START -> "At start"
                     StepTiming.AFTER_PREVIOUS -> "After previous step"

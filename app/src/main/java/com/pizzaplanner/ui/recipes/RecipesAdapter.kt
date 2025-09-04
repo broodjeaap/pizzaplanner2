@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
 import com.pizzaplanner.databinding.ItemRecipeBinding
+import com.pizzaplanner.utils.MarkdownUtils
 
 class RecipesAdapter(
     private val onRecipeClick: (Recipe) -> Unit
@@ -33,7 +34,7 @@ class RecipesAdapter(
         fun bind(recipe: Recipe) {
             binding.apply {
                 textViewRecipeName.text = recipe.name
-                textViewRecipeDescription.text = recipe.description
+                MarkdownUtils.setMarkdownText(textViewRecipeDescription, recipe.description)
                 textViewDifficulty.text = recipe.difficulty
                 textViewTotalTime.text = root.context.getString(
                     R.string.recipe_total_time,

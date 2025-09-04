@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.R
 import com.pizzaplanner.databinding.ItemTimelineStepDialogBinding
+import com.pizzaplanner.utils.MarkdownUtils
 import com.pizzaplanner.utils.StepTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -41,7 +42,7 @@ class TimelineDialogAdapter(
             binding.apply {
                 // Step information
                 textViewStepName.text = stepTimeline.step.name
-                textViewStepDescription.text = stepTimeline.processedDescription
+                MarkdownUtils.setMarkdownText(textViewStepDescription, stepTimeline.processedDescription)
                 
                 // Timing information
                 textViewStartDate.text = formatDate(stepTimeline.startTime)

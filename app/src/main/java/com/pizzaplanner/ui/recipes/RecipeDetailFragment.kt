@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
 import com.pizzaplanner.databinding.FragmentRecipeDetailBinding
+import com.pizzaplanner.utils.MarkdownUtils
 
 class RecipeDetailFragment : Fragment() {
 
@@ -42,7 +43,7 @@ class RecipeDetailFragment : Fragment() {
     private fun setupUI(recipe: Recipe) {
         binding.apply {
             textViewRecipeName.text = recipe.name
-            textViewRecipeDescription.text = recipe.description
+            MarkdownUtils.setMarkdownText(textViewRecipeDescription, recipe.description)
             textViewDifficulty.text = recipe.difficulty
             textViewTotalTime.text = getString(R.string.recipe_total_time, recipe.totalTimeHours)
             

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.databinding.ItemTimelineStepBinding
+import com.pizzaplanner.utils.MarkdownUtils
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -51,7 +52,7 @@ class TimelineAdapter : ListAdapter<TimelineStepItem, TimelineAdapter.ViewHolder
                 
                 // Show description if available
                 if (item.description.isNotBlank()) {
-                    textViewStepDescription.text = item.description
+                    MarkdownUtils.setMarkdownText(textViewStepDescription, item.description)
                     textViewStepDescription.visibility = View.VISIBLE
                 } else {
                     textViewStepDescription.visibility = View.GONE
