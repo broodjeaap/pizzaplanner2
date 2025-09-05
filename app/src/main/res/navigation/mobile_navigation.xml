@@ -35,7 +35,9 @@
         tools:layout="@layout/fragment_planning">
         <argument
             android:name="recipe"
-            app:argType="com.pizzaplanner.data.models.Recipe" />
+            app:argType="com.pizzaplanner.data.models.Recipe"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
     <fragment

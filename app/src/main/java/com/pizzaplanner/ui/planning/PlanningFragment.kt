@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pizzaplanner.R
@@ -93,9 +94,24 @@ class PlanningFragment : Fragment() {
         arguments?.getParcelable<Recipe>("recipe")?.let { recipe ->
             passedRecipe = recipe
             selectRecipe(recipe)
+        } ?: run {
+            // No recipe passed, clear any previously selected recipe
+            // This handles the case when navigating directly to the planning tab
+            if (passedRecipe != null) {
+                resetRecipeSelection()
+                passedRecipe = null
+            }
         }
         
+        // Clear arguments after processing to prevent navigation issues
+        arguments = null
+        
         updateUI()
+        
+        // Ensure the fragment doesn't block navigation
+        // This is a workaround for the bottom navigation issue
+        binding.root.isFocusable = false
+        binding.root.isClickable = false
     }
     
     private fun setupRecyclerViews() {
@@ -494,5 +510,11 @@ class PlanningFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // Ensure that the fragment doesn't block navigation
+        // This might help with the bottom navigation issue
     }
 }
