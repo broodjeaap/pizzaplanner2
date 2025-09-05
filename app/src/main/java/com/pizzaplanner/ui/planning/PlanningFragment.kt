@@ -30,6 +30,7 @@ import com.pizzaplanner.data.models.AlarmEvent
 import com.pizzaplanner.data.models.AlarmType
 import com.pizzaplanner.utils.TimeCalculationService
 import com.pizzaplanner.utils.YamlParser
+import com.pizzaplanner.ui.planning.IngredientsAdapter
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -44,11 +45,16 @@ class PlanningFragment : Fragment() {
     
     private lateinit var variablesAdapter: PlanningVariablesAdapter
     private lateinit var timelineAdapter: TimelineAdapter
+    private lateinit var ingredientsAdapter: IngredientsAdapter
     
     private var selectedRecipe: Recipe? = null
     private var passedRecipe: Recipe? = null
     private var targetDateTime: LocalDateTime? = null
     private val variableValues = mutableMapOf<String, Double>()
+    
+    // Dough ball configuration values
+    private var numberOfDoughBalls: Int = 4
+    private var doughBallSize: Int = 250
     
     private val timeCalculationService = TimeCalculationService()
     private lateinit var plannedRecipeRepository: PlannedRecipeRepository
@@ -81,6 +87,7 @@ class PlanningFragment : Fragment() {
         plannedRecipeRepository = PlannedRecipeRepository(requireContext())
         setupRecyclerViews()
         setupClickListeners()
+        setupDoughConfigurationListeners()
         
         // Check for passed recipe argument
         arguments?.getParcelable<Recipe>("recipe")?.let { recipe ->
@@ -110,6 +117,14 @@ class PlanningFragment : Fragment() {
             adapter = timelineAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+        
+        // Ingredients adapter
+        ingredientsAdapter = IngredientsAdapter()
+        
+        binding.recyclerViewIngredients.apply {
+            adapter = ingredientsAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
     
     private fun setupClickListeners() {
@@ -131,6 +146,28 @@ class PlanningFragment : Fragment() {
         
         binding.buttonStartRecipe.setOnClickListener {
             startRecipe()
+        }
+    }
+    
+    private fun setupDoughConfigurationListeners() {
+        // Number of dough balls slider
+        binding.sliderDoughBalls.addOnChangeListener { _, value, _ ->
+            numberOfDoughBalls = value.toInt()
+            binding.textViewDoughBallsValue.text = "$numberOfDoughBalls"
+            updateIngredients()
+            if (targetDateTime != null) {
+                updateTimeline()
+            }
+        }
+        
+        // Dough ball size slider
+        binding.sliderDoughBallSize.addOnChangeListener { _, value, _ ->
+            doughBallSize = value.toInt()
+            binding.textViewDoughBallSizeValue.text = "${doughBallSize}g"
+            updateIngredients()
+            if (targetDateTime != null) {
+                updateTimeline()
+            }
         }
     }
     
@@ -223,6 +260,12 @@ class PlanningFragment : Fragment() {
                 "Difficulty: ${recipe.difficulty.replaceFirstChar { it.uppercase() }} • " +
                 "Base time: ${recipe.totalTimeHours} hours"
             
+            // Show dough configuration
+            binding.cardDoughConfig.visibility = View.VISIBLE
+            
+            // Show ingredients as soon as recipe is selected
+            updateIngredients()
+            
             // Show variables
             binding.cardVariables.visibility = View.VISIBLE
             val variableItems = recipe.variables.map { variable ->
@@ -231,6 +274,8 @@ class PlanningFragment : Fragment() {
             variablesAdapter.submitList(variableItems)
         } else {
             binding.layoutSelectedRecipe.visibility = View.GONE
+            binding.cardDoughConfig.visibility = View.GONE
+            binding.cardIngredients.visibility = View.GONE
             binding.cardVariables.visibility = View.GONE
         }
         
@@ -260,7 +305,17 @@ class PlanningFragment : Fragment() {
         val targetTime = targetDateTime ?: return
         
         try {
-            val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
+            // Update variable values with dough ball configuration
+            val updatedVariableValues = variableValues.toMutableMap().apply {
+                put("dough_balls", numberOfDoughBalls.toDouble())
+                put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            val timeline = timeCalculationService.calculateRecipeTimeline(
+                recipe, 
+                updatedVariableValues, 
+                targetTime
+            )
             
             // Update start time display
             binding.textViewStartTime.text = "Start: ${formatDateTime(timeline.startTime)}"
@@ -278,6 +333,14 @@ class PlanningFragment : Fragment() {
             }
             
             timelineAdapter.submitList(timelineItems)
+            
+            // Update ingredients
+            if (timeline.ingredients.isNotEmpty()) {
+                binding.cardIngredients.visibility = View.VISIBLE
+                ingredientsAdapter.submitList(timeline.ingredients)
+            } else {
+                binding.cardIngredients.visibility = View.GONE
+            }
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error calculating timeline", Toast.LENGTH_SHORT).show()
         }
@@ -288,13 +351,48 @@ class PlanningFragment : Fragment() {
         val targetTime = targetDateTime ?: return
         
         try {
-            val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
+            // Update variable values with dough ball configuration
+            val updatedVariableValues = variableValues.toMutableMap().apply {
+                put("dough_balls", numberOfDoughBalls.toDouble())
+                put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            timeCalculationService.calculateRecipeTimeline(recipe, updatedVariableValues, targetTime)
             
             // TODO: Save to local storage/database
             Toast.makeText(requireContext(), "Plan saved successfully!", Toast.LENGTH_SHORT).show()
             
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error saving plan", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun updateIngredients() {
+        val recipe = selectedRecipe ?: return
+        
+        try {
+            // Update variable values with dough ball configuration
+            val updatedVariableValues = variableValues.toMutableMap().apply {
+                put("dough_balls", numberOfDoughBalls.toDouble())
+                put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            // Calculate ingredients using current time as target (doesn't matter for ingredients)
+            val timeline = timeCalculationService.calculateRecipeTimeline(
+                recipe, 
+                updatedVariableValues, 
+                LocalDateTime.now()
+            )
+            
+            // Update ingredients
+            if (timeline.ingredients.isNotEmpty()) {
+                binding.cardIngredients.visibility = View.VISIBLE
+                ingredientsAdapter.submitList(timeline.ingredients)
+            } else {
+                binding.cardIngredients.visibility = View.GONE
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Error calculating ingredients", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -314,7 +412,17 @@ class PlanningFragment : Fragment() {
         }
         
         try {
-            val timeline = timeCalculationService.calculateRecipeTimeline(recipe, variableValues, targetTime)
+            // Update variable values with dough ball configuration
+            val updatedVariableValues = variableValues.toMutableMap().apply {
+                put("dough_balls", numberOfDoughBalls.toDouble())
+                put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            val timeline = timeCalculationService.calculateRecipeTimeline(
+                recipe, 
+                updatedVariableValues, 
+                targetTime
+            )
             
             // Get event name from input
             val eventName = binding.editTextEventName.text?.toString()?.trim()
@@ -326,7 +434,7 @@ class PlanningFragment : Fragment() {
                 recipeName = recipe.name,
                 targetCompletionTime = targetTime,
                 startTime = timeline.startTime,
-                variableValues = variableValues,
+                variableValues = updatedVariableValues,
                 status = RecipeStatus.IN_PROGRESS,
                 currentStepIndex = 0,
                 eventName = if (eventName.isNullOrEmpty()) null else eventName

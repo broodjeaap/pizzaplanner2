@@ -16,6 +16,7 @@ class TimeCalculationService {
         val startTime = targetCompletionTime.minusMinutes(totalDurationMinutes.toLong())
         
         val stepTimeline = calculateStepTimeline(processedSteps, startTime)
+        val processedIngredients = calculateIngredients(recipe.ingredients, variableValues)
         
         return RecipeTimeline(
             recipe = recipe,
@@ -23,9 +24,11 @@ class TimeCalculationService {
             startTime = startTime,
             targetCompletionTime = targetCompletionTime,
             totalDurationMinutes = totalDurationMinutes,
-            steps = stepTimeline
+            steps = stepTimeline,
+            ingredients = processedIngredients
         )
     }
+    
     
     private fun processSteps(
         steps: List<RecipeStep>,
@@ -134,6 +137,7 @@ class TimeCalculationService {
         return steps.sumOf { it.durationMinutes }
     }
     
+    
     private fun calculateStepTimeline(
         steps: List<ProcessedStep>,
         startTime: LocalDateTime
@@ -162,6 +166,31 @@ class TimeCalculationService {
         return timeline
     }
     
+    private fun calculateIngredients(
+        ingredients: List<Ingredient>,
+        variableValues: Map<String, Double>
+    ): List<ProcessedIngredient> {
+        val doughBalls = variableValues["dough_balls"] ?: 1.0
+        val doughBallSize = variableValues["dough_ball_size_g"] ?: 250.0
+        
+        // Base reference: 4 dough balls of 250g each = 1000g total
+        val baseTotalDoughWeight = 4.0 * 250.0
+        val currentTotalDoughWeight = doughBalls * doughBallSize
+        val scalingFactor = currentTotalDoughWeight / baseTotalDoughWeight
+        
+        return ingredients.map { ingredient ->
+            // Scale all ingredients based on total dough weight
+            val scaledAmount = ingredient.amount * scalingFactor
+            
+            ProcessedIngredient(
+                name = ingredient.name,
+                amount = scaledAmount,
+                unit = ingredient.unit,
+                category = ingredient.category
+            )
+        }
+    }
+    
 }
 
 data class RecipeTimeline(
@@ -170,7 +199,8 @@ data class RecipeTimeline(
     val startTime: LocalDateTime,
     val targetCompletionTime: LocalDateTime,
     val totalDurationMinutes: Int,
-    val steps: List<StepTimeline>
+    val steps: List<StepTimeline>,
+    val ingredients: List<ProcessedIngredient> = emptyList()
 )
 
 data class ProcessedStep(
@@ -187,4 +217,11 @@ data class StepTimeline(
     val durationMinutes: Int,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime
+)
+
+data class ProcessedIngredient(
+    val name: String,
+    val amount: Double,
+    val unit: String,
+    val category: String?
 )

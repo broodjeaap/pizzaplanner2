@@ -178,60 +178,64 @@ class ActiveRecipesAdapter(
 
     fun bind(recipeData: ActiveRecipeData) {
         with(binding) {
-            val displayName = if (!recipeData.recipe.eventName.isNullOrEmpty()) {
-                recipeData.recipe.eventName
+            // Event name
+            if (!recipeData.recipe.eventName.isNullOrEmpty()) {
+                textViewEventName.text = recipeData.recipe.eventName
+                textViewEventName.visibility = View.VISIBLE
+                textViewRecipeName.text = recipeData.recipe.recipeName
             } else {
-                recipeData.recipe.recipeName
+                textViewEventName.visibility = View.GONE
+                textViewRecipeName.text = recipeData.recipe.recipeName
             }
-            textViewRecipeName.text = displayName
-                textViewStatus.text = when (recipeData.status) {
-                    RecipeStatus.COMPLETED -> "Completed"
-                    RecipeStatus.CANCELLED -> "Cancelled"
-                    else -> "Unknown"
+            
+            textViewStatus.text = when (recipeData.status) {
+                RecipeStatus.COMPLETED -> "Completed"
+                RecipeStatus.CANCELLED -> "Cancelled"
+                else -> "Unknown"
+            }
+            
+            // Set different colors based on status
+            when (recipeData.status) {
+                RecipeStatus.COMPLETED -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_green_dark))
                 }
-                
-                // Set different colors based on status
-                when (recipeData.status) {
-                    RecipeStatus.COMPLETED -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_green_dark))
-                    }
-                    RecipeStatus.CANCELLED -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_red_dark))
-                    }
-                    RecipeStatus.SCHEDULED -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
-                    }
-                    RecipeStatus.IN_PROGRESS -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
-                    }
-                    RecipeStatus.PAUSED -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_orange_dark))
-                    }
-                    else -> {
-                        textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.darker_gray))
-                    }
+                RecipeStatus.CANCELLED -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_red_dark))
                 }
+                RecipeStatus.SCHEDULED -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
+                }
+                RecipeStatus.IN_PROGRESS -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_dark))
+                }
+                RecipeStatus.PAUSED -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_orange_dark))
+                }
+                else -> {
+                    textViewStatus.setTextColor(binding.root.context.getColor(android.R.color.darker_gray))
+                }
+            }
 
-                textViewStartTime.text = formatDateTime(recipeData.recipe.startTime)
-                
-                // End time - use last step end time or current time
-                val endTime = if (recipeData.timeline.steps.isNotEmpty()) {
-                    recipeData.timeline.steps.last().endTime ?: LocalDateTime.now()
-                } else {
-                    LocalDateTime.now()
-                }
-                textViewEndTime.text = formatDateTime(endTime)
+            textViewStartTime.text = formatDateTime(recipeData.recipe.startTime)
+            
+            // End time - use last step end time or current time
+            val endTime = if (recipeData.timeline.steps.isNotEmpty()) {
+                recipeData.timeline.steps.last().endTime ?: LocalDateTime.now()
+            } else {
+                LocalDateTime.now()
+            }
+            textViewEndTime.text = formatDateTime(endTime)
 
-                root.setOnClickListener {
-                    onRecipeClick(recipeData)
-                }
-                
-                // Long click listener
-                root.setOnLongClickListener {
-                    onRecipeLongClick(recipeData)
-                }
+            root.setOnClickListener {
+                onRecipeClick(recipeData)
+            }
+            
+            // Long click listener
+            root.setOnLongClickListener {
+                onRecipeLongClick(recipeData)
             }
         }
+    }
 
         private fun formatDateTime(dateTime: LocalDateTime): String {
             return dateTime.format(dateTimeFormatter)

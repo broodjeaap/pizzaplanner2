@@ -32,6 +32,7 @@ class YamlParser {
         
         val variables = parseVariables(recipeMap["variables"] as? List<Map<String, Any>> ?: emptyList())
         val steps = parseSteps(recipeMap["steps"] as? List<Map<String, Any>> ?: emptyList())
+        val ingredients = parseIngredients(recipeMap["ingredients"] as? List<Map<String, Any>> ?: emptyList())
         
         return Recipe(
             id = id,
@@ -39,6 +40,7 @@ class YamlParser {
             description = description,
             variables = variables,
             steps = steps,
+            ingredients = ingredients,
             imageUrl = imageUrl,
             difficulty = difficulty,
             totalTimeHours = totalTimeHours
@@ -102,6 +104,22 @@ class YamlParser {
                 isOptional = isOptional,
                 temperature = temperature,
                 notes = notes
+            )
+        }
+    }
+    
+    private fun parseIngredients(ingredientsData: List<Map<String, Any>>): List<Ingredient> {
+        return ingredientsData.map { ingredientMap ->
+            val name = ingredientMap["name"] as String
+            val amount = (ingredientMap["amount"] as Number).toDouble()
+            val unit = ingredientMap["unit"] as String
+            val category = ingredientMap["category"] as? String
+            
+            Ingredient(
+                name = name,
+                amount = amount,
+                unit = unit,
+                category = category
             )
         }
     }

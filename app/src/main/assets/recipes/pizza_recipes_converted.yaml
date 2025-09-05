@@ -34,6 +34,27 @@ recipes:
         max: 4
         type: "integer"
         unit: "hours"
+    ingredients:
+      - name: "Bread Flour"
+        amount: 500
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 325
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 10
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 1
+        unit: "g"
+        category: "leavening"
+      - name: "Honey"
+        amount: 5
+        unit: "g"
+        category: "sweetener"
     steps:
       - id: "make_poolish"
         name: "Make the poolish"
@@ -139,6 +160,27 @@ recipes:
         max: 4
         type: "integer"
         unit: "hours"
+    ingredients:
+      - name: "Bread Flour"
+        amount: 500
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 325
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 10
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 1
+        unit: "g"
+        category: "leavening"
+      - name: "Honey"
+        amount: 5
+        unit: "g"
+        category: "sweetener"
     steps:
       - id: "make_poolish"
         name: "Make the Poolish"
@@ -215,6 +257,23 @@ recipes:
         max: 4
         type: "integer"
         unit: "hours"
+    ingredients:
+      - name: "Bread Flour"
+        amount: 500
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 325
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 10
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 2
+        unit: "g"
+        category: "leavening"
     steps:
       - id: "make_dough"
         name: "Make the dough"
@@ -268,6 +327,23 @@ recipes:
         max: 4
         type: "integer"
         unit: "hours"
+    ingredients:
+      - name: "Bread Flour"
+        amount: 500
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 325
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 10
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 2
+        unit: "g"
+        category: "leavening"
     steps:
       - id: "make_dough"
         name: "Make the dough"
@@ -328,6 +404,27 @@ recipes:
         max: 4
         type: "integer"
         unit: "hours"
+    ingredients:
+      - name: "Bread Flour"
+        amount: 560
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 360
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 12
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 3
+        unit: "g"
+        category: "leavening"
+      - name: "Olive Oil"
+        amount: 20
+        unit: "ml"
+        category: "fat"
     steps:
       - id: "make_dough"
         name: "Make the dough"

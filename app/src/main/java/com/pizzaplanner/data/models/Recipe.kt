@@ -10,6 +10,7 @@ data class Recipe(
     val description: String,
     val variables: List<RecipeVariable>,
     val steps: List<RecipeStep>,
+    val ingredients: List<Ingredient> = emptyList(),
     val imageUrl: String? = null,
     val difficulty: String = "Medium",
     val totalTimeHours: Int = 24
@@ -53,3 +54,11 @@ enum class StepTiming : Parcelable {
     PARALLEL,
     SCHEDULED
 }
+
+@Parcelize
+data class Ingredient(
+    val name: String,
+    val amount: Double,
+    val unit: String,
+    val category: String? = null
+) : Parcelable
