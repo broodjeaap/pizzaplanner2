@@ -117,7 +117,15 @@ class PlanningFragment : Fragment() {
     private fun setupRecyclerViews() {
         // Variables adapter
         variablesAdapter = PlanningVariablesAdapter { variableId, value ->
-            variableValues[variableId] = value
+            // Constrain the value to the valid range for this variable
+            val constrainedValue = constrainVariableValue(variableId, value)
+            variableValues[variableId] = constrainedValue
+            
+            // Check if this is a time-related variable that affects the recipe duration
+            if (isTimeVariable(variableId)) {
+                updateTargetTimeForTimeVariables()
+            }
+            
             updateTimeline()
         }
         
@@ -213,8 +221,11 @@ class PlanningFragment : Fragment() {
         // Initialize variable values with defaults
         variableValues.clear()
         recipe.variables.forEach { variable ->
-            variableValues[variable.name] = variable.defaultValue
+            variableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
         }
+        
+        // Set default target time to earliest possible time
+        targetDateTime = calculateEarliestTargetTime(recipe)
         
         updateUI()
     }
@@ -226,37 +237,61 @@ class PlanningFragment : Fragment() {
     }
     
     private fun showDatePicker() {
+        val recipe = selectedRecipe ?: return
+        
         val calendar = Calendar.getInstance()
         val currentDate = targetDateTime?.toLocalDate() ?: LocalDate.now().plusDays(1)
         
         calendar.set(currentDate.year, currentDate.monthValue - 1, currentDate.dayOfMonth)
+        
+        // Calculate minimum date based on recipe duration
+        val earliestTargetTime = calculateEarliestTargetTime(recipe)
+        val minDateMillis = earliestTargetTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         
         DatePickerDialog(
             requireContext(),
             { _, year, month, dayOfMonth ->
                 val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
                 val currentTime = targetDateTime?.toLocalTime() ?: LocalTime.of(18, 0)
-                targetDateTime = LocalDateTime.of(selectedDate, currentTime)
-                updateUI()
+                val newTargetDateTime = LocalDateTime.of(selectedDate, currentTime)
+                
+                // Validate the selected date
+                if (isTargetTimeValid(newTargetDateTime, recipe)) {
+                    targetDateTime = newTargetDateTime
+                    updateUI()
+                } else {
+                    // Show error message
+                    Toast.makeText(requireContext(), "Selected time would result in steps in the past. Please choose a later time.", Toast.LENGTH_LONG).show()
+                }
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).apply {
-            datePicker.minDate = System.currentTimeMillis()
+            datePicker.minDate = minDateMillis
         }.show()
     }
     
     private fun showTimePicker() {
+        val recipe = selectedRecipe ?: return
+        val currentDate = targetDateTime?.toLocalDate() ?: LocalDate.now().plusDays(1)
+        
         val currentTime = targetDateTime?.toLocalTime() ?: LocalTime.of(18, 0)
         
         TimePickerDialog(
             requireContext(),
             { _, hourOfDay, minute ->
                 val selectedTime = LocalTime.of(hourOfDay, minute)
-                val currentDate = targetDateTime?.toLocalDate() ?: LocalDate.now().plusDays(1)
-                targetDateTime = LocalDateTime.of(currentDate, selectedTime)
-                updateUI()
+                val newTargetDateTime = LocalDateTime.of(currentDate, selectedTime)
+                
+                // Validate the selected time
+                if (isTargetTimeValid(newTargetDateTime, recipe)) {
+                    targetDateTime = newTargetDateTime
+                    updateUI()
+                } else {
+                    // Show error message
+                    Toast.makeText(requireContext(), "Selected time would result in steps in the past. Please choose a later time.", Toast.LENGTH_LONG).show()
+                }
             },
             currentTime.hour,
             currentTime.minute,
@@ -285,7 +320,11 @@ class PlanningFragment : Fragment() {
             // Show variables
             binding.cardVariables.visibility = View.VISIBLE
             val variableItems = recipe.variables.map { variable ->
-                PlanningVariableItem(variable, variableValues[variable.name] ?: variable.defaultValue)
+                val currentValue = variableValues[variable.name] ?: variable.defaultValue
+                val constrainedValue = constrainVariableValue(variable.name, currentValue)
+                // Update the variableValues map with the constrained value
+                variableValues[variable.name] = constrainedValue
+                PlanningVariableItem(variable, constrainedValue)
             }
             variablesAdapter.submitList(variableItems)
         } else {
@@ -328,10 +367,23 @@ class PlanningFragment : Fragment() {
             }
             
             val timeline = timeCalculationService.calculateRecipeTimeline(
-                recipe, 
-                updatedVariableValues, 
+                recipe,
+                updatedVariableValues,
                 targetTime
             )
+            
+            // Check if any steps are in the past
+            val hasPastSteps = timeline.steps.any { step ->
+                step.startTime.isBefore(LocalDateTime.now())
+            }
+            
+            // Show warning if there are past steps
+            if (hasPastSteps) {
+                binding.textViewTimelineWarning.visibility = View.VISIBLE
+                binding.textViewTimelineWarning.text = "Warning: Some steps would start in the past. Please select a later completion time."
+            } else {
+                binding.textViewTimelineWarning.visibility = View.GONE
+            }
             
             // Update start time display
             binding.textViewStartTime.text = "Start: ${formatDateTime(timeline.startTime)}"
@@ -365,6 +417,12 @@ class PlanningFragment : Fragment() {
     private fun savePlan() {
         val recipe = selectedRecipe ?: return
         val targetTime = targetDateTime ?: return
+        
+        // Validate the target time
+        if (!isTargetTimeValid(targetTime, recipe)) {
+            Toast.makeText(requireContext(), "Selected time would result in steps in the past. Please choose a later time.", Toast.LENGTH_LONG).show()
+            return
+        }
         
         try {
             // Update variable values with dough ball configuration
@@ -416,6 +474,12 @@ class PlanningFragment : Fragment() {
         val recipe = selectedRecipe ?: return
         val targetTime = targetDateTime ?: return
         
+        // Validate the target time
+        if (!isTargetTimeValid(targetTime, recipe)) {
+            Toast.makeText(requireContext(), "Selected time would result in steps in the past. Please choose a later time.", Toast.LENGTH_LONG).show()
+            return
+        }
+        
         // Check for alarm permission on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -435,8 +499,8 @@ class PlanningFragment : Fragment() {
             }
             
             val timeline = timeCalculationService.calculateRecipeTimeline(
-                recipe, 
-                updatedVariableValues, 
+                recipe,
+                updatedVariableValues,
                 targetTime
             )
             
@@ -506,6 +570,97 @@ class PlanningFragment : Fragment() {
         }
         
         return "$dateText, ${dateTime.format(timeFormatter)}"
+    }
+    
+    private fun isTargetTimeValid(targetTime: LocalDateTime, recipe: Recipe): Boolean {
+        // Calculate the timeline to get the start time
+        val updatedVariableValues = variableValues.toMutableMap().apply {
+            put("dough_balls", numberOfDoughBalls.toDouble())
+            put("dough_ball_size_g", doughBallSize.toDouble())
+        }
+        
+        val timeline = timeCalculationService.calculateRecipeTimeline(
+            recipe,
+            updatedVariableValues,
+            targetTime
+        )
+        
+        // Check if the start time is in the past
+        return timeline.startTime.isAfter(LocalDateTime.now()) || timeline.startTime.isEqual(LocalDateTime.now())
+    }
+    
+    private fun calculateEarliestTargetTime(recipe: Recipe): LocalDateTime {
+        // Initialize variable values with defaults if not already set
+        val tempVariableValues = variableValues.toMutableMap()
+        recipe.variables.forEach { variable ->
+            if (!tempVariableValues.containsKey(variable.name)) {
+                tempVariableValues[variable.name] = variable.defaultValue
+            }
+        }
+        
+        // Add dough ball configuration values
+        tempVariableValues["dough_balls"] = numberOfDoughBalls.toDouble()
+        tempVariableValues["dough_ball_size_g"] = doughBallSize.toDouble()
+        
+        // Calculate the timeline with current variable values
+        val timeline = timeCalculationService.calculateRecipeTimeline(
+            recipe,
+            tempVariableValues,
+            LocalDateTime.now()
+        )
+        
+        // Calculate how much time we need to add to make the start time valid
+        val currentTime = LocalDateTime.now()
+        val startTime = timeline.startTime
+        
+        // If start time is already in the future or now, return current time
+        if (startTime.isAfter(currentTime) || startTime.isEqual(currentTime)) {
+            return LocalDateTime.now().withSecond(0).withNano(0).plusMinutes(1)
+        }
+        
+        // Calculate the difference and add it to current time
+        val duration = java.time.Duration.between(startTime, currentTime)
+        return currentTime.plus(duration).withSecond(0).withNano(0).plusMinutes(1)
+    }
+    
+    private fun isTimeVariable(variableId: String): Boolean {
+        // Check if the variable name contains time-related keywords
+        val timeKeywords = listOf("time", "duration", "hours", "minutes", "rise", "proof", "ferment", "cold", "warm")
+        
+        // Check if the variable is in the current recipe's variables
+        val recipe = selectedRecipe ?: return false
+        val variable = recipe.variables.find { it.name == variableId } ?: return false
+        
+        // Check if the variable unit is time-related
+        val timeUnits = listOf("hours", "minutes", "days")
+        val hasTimeUnit = variable.unit?.let { unit ->
+            timeUnits.any { timeUnit -> unit.contains(timeUnit, ignoreCase = true) }
+        } ?: false
+        
+        // Return true if either the name contains time keywords or the unit is time-related
+        return timeKeywords.any { keyword ->
+            variableId.lowercase().contains(keyword)
+        } || hasTimeUnit
+    }
+    
+    private fun updateTargetTimeForTimeVariables() {
+        val recipe = selectedRecipe ?: return
+        
+        // Calculate new earliest target time with updated variables
+        val newTargetTime = calculateEarliestTargetTime(recipe)
+        
+        // Always update the target time when time variables change
+        // This ensures the schedule remains valid even if the user increases time variables
+        targetDateTime = newTargetTime
+        updateUI()
+    }
+    
+    private fun constrainVariableValue(variableName: String, value: Double): Double {
+        val recipe = selectedRecipe ?: return value
+        val variable = recipe.variables.find { it.name == variableName } ?: return value
+        
+        // Constrain the value to be within the variable's min and max values
+        return value.coerceIn(variable.minValue, variable.maxValue)
     }
 
     override fun onDestroyView() {

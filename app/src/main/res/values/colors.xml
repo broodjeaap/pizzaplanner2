@@ -16,4 +16,8 @@
     <color name="difficulty_easy">#4CAF50</color>
     <color name="difficulty_medium">#FF9800</color>
     <color name="difficulty_hard">#F44336</color>
+    
+    <!-- Warning colors -->
+    <color name="warning_text">#FF6F00</color>
+    <color name="warning_background">#FFF8E1</color>
 </resources>
