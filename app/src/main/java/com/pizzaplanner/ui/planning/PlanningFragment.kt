@@ -456,15 +456,6 @@ class PlanningFragment : Fragment() {
                 eventName = if (eventName.isNullOrEmpty()) null else eventName
             )
             
-            // Save to repository
-            plannedRecipeRepository.saveRecipe(
-                plannedRecipe = plannedRecipe,
-                recipeTimeline = timeline,
-                currentStepIndex = 0,
-                status = RecipeStatus.IN_PROGRESS,
-                isPaused = false
-            )
-            
             // Schedule alarms for recipe steps
             val alarmEvents = timeline.steps.map { step ->
                 AlarmEvent(
@@ -476,6 +467,16 @@ class PlanningFragment : Fragment() {
                 )
             }
             AlarmService.scheduleMultipleAlarms(requireContext(), alarmEvents)
+            
+            // Save recipe with alarm events
+            plannedRecipeRepository.saveRecipe(
+                plannedRecipe = plannedRecipe,
+                recipeTimeline = timeline,
+                alarmEvents = alarmEvents,
+                currentStepIndex = 0,
+                status = RecipeStatus.IN_PROGRESS,
+                isPaused = false
+            )
             
             Toast.makeText(requireContext(), "Recipe started! Check the Active tab.", Toast.LENGTH_LONG).show()
             

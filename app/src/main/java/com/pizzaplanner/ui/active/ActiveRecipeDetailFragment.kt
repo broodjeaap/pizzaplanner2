@@ -16,6 +16,7 @@ import com.pizzaplanner.data.models.*
 import com.pizzaplanner.data.repository.PlannedRecipeRepository
 import com.pizzaplanner.databinding.FragmentActiveBinding
 import com.pizzaplanner.databinding.DialogTimelineBinding
+import com.pizzaplanner.services.AlarmService
 import com.pizzaplanner.utils.RecipeTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -305,6 +306,12 @@ class ActiveRecipeDetailFragment : Fragment() {
         val data = activeRecipeData ?: return
         stepTimer?.cancel()
         
+        // Cancel alarm for the completed step
+        if (data.currentStepIndex < data.alarmEvents.size) {
+            val alarmEvent = data.alarmEvents[data.currentStepIndex]
+            AlarmService.cancelAlarm(requireContext(), alarmEvent.id)
+        }
+        
         val newStepIndex = data.currentStepIndex + 1
         
         repository.updateRecipe(recipeId) { currentData ->
@@ -346,6 +353,11 @@ class ActiveRecipeDetailFragment : Fragment() {
     private fun cancelRecipe() {
         stepTimer?.cancel()
         
+        // Cancel all alarms for this recipe
+        activeRecipeData?.let { data ->
+            AlarmService.cancelAllAlarms(requireContext(), data.alarmEvents)
+        }
+        
         repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(status = RecipeStatus.CANCELLED)
         }
@@ -356,6 +368,11 @@ class ActiveRecipeDetailFragment : Fragment() {
     
     private fun completeRecipe() {
         stepTimer?.cancel()
+        
+        // Cancel all remaining alarms for this recipe
+        activeRecipeData?.let { data ->
+            AlarmService.cancelAllAlarms(requireContext(), data.alarmEvents)
+        }
         
         repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(status = RecipeStatus.COMPLETED)

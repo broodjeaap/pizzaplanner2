@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.google.gson.reflect.TypeToken
 import com.pizzaplanner.data.models.*
+import com.pizzaplanner.data.models.AlarmEvent
 import com.pizzaplanner.utils.RecipeTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -29,6 +30,7 @@ class PlannedRecipeRepository(context: Context) {
     fun saveRecipe(
         plannedRecipe: PlannedRecipe,
         recipeTimeline: RecipeTimeline,
+        alarmEvents: List<AlarmEvent> = emptyList(),
         currentStepIndex: Int = 0,
         status: RecipeStatus = RecipeStatus.IN_PROGRESS,
         isPaused: Boolean = false
@@ -36,6 +38,7 @@ class PlannedRecipeRepository(context: Context) {
         val recipeData = ActiveRecipeData(
             recipe = plannedRecipe,
             timeline = recipeTimeline,
+            alarmEvents = alarmEvents,
             currentStepIndex = currentStepIndex,
             status = status,
             isPaused = isPaused
@@ -78,6 +81,17 @@ class PlannedRecipeRepository(context: Context) {
         }
     }
     
+    fun updateRecipeWithAlarms(recipeId: String, alarmEvents: List<AlarmEvent>, updater: (ActiveRecipeData) -> ActiveRecipeData) {
+        val recipes = getAllRecipesList().toMutableList()
+        val index = recipes.indexOfFirst { it.recipe.id == recipeId }
+        if (index != -1) {
+            val updatedRecipe = updater(recipes[index].copy(alarmEvents = alarmEvents))
+            recipes[index] = updatedRecipe
+            val json = gson.toJson(recipes)
+            sharedPreferences.edit().putString(KEY_ACTIVE_RECIPES, json).apply()
+        }
+    }
+    
     fun removeRecipe(recipeId: String) {
         val recipes = getAllRecipesList().toMutableList()
         recipes.removeAll { it.recipe.id == recipeId }
@@ -95,7 +109,8 @@ class PlannedRecipeRepository(context: Context) {
         val timeline: RecipeTimeline,
         val currentStepIndex: Int = 0,
         val status: RecipeStatus = RecipeStatus.IN_PROGRESS,
-        val isPaused: Boolean = false
+        val isPaused: Boolean = false,
+        val alarmEvents: List<AlarmEvent> = emptyList()
     )
     
     // Custom TypeAdapter for LocalDateTime
