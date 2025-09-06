@@ -96,4 +96,13 @@
     <string name="view_timeline">View Timeline</string>
     <string name="no_active_recipe">No active recipe</string>
     <string name="start_recipe_from_planning">Start a recipe from the Planning tab to track your progress here</string>
+    
+    <!-- Alarm Screen -->
+    <string name="alarm_title_step">⏰ Time for Next Step</string>
+    <string name="alarm_title_final">🍕 Pizza Dough Ready!</string>
+    <string name="alarm_title_generic">📋 Recipe Alert</string>
+    <string name="alarm_button_dismiss">Got it!</string>
+    <string name="alarm_button_dismiss_final">Awesome!</string>
+    <string name="alarm_button_dismiss_generic">OK</string>
+    <string name="alarm_button_snooze">Snooze 5min</string>
 </resources>

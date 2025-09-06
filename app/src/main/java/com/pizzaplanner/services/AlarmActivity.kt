@@ -3,6 +3,7 @@ package com.pizzaplanner.services
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.pizzaplanner.R
 import com.pizzaplanner.databinding.ActivityAlarmBinding
 
 class AlarmActivity : AppCompatActivity() {
@@ -45,16 +46,16 @@ class AlarmActivity : AppCompatActivity() {
             // Customize based on alarm type
             when (alarmType) {
                 "FINAL_COMPLETION" -> {
-                    textViewTitle.text = "🍕 Pizza Dough Ready!"
-                    buttonDismiss.text = "Awesome!"
+                    textViewTitle.text = getString(R.string.alarm_title_final)
+                    buttonDismiss.text = getString(R.string.alarm_button_dismiss_final)
                 }
                 "STEP_START" -> {
-                    textViewTitle.text = "⏰ Time for Next Step"
-                    buttonDismiss.text = "Got it!"
+                    textViewTitle.text = getString(R.string.alarm_title_step)
+                    buttonDismiss.text = getString(R.string.alarm_button_dismiss)
                 }
                 else -> {
-                    textViewTitle.text = "📋 Recipe Alert"
-                    buttonDismiss.text = "OK"
+                    textViewTitle.text = getString(R.string.alarm_title_generic)
+                    buttonDismiss.text = getString(R.string.alarm_button_dismiss_generic)
                 }
             }
         }
