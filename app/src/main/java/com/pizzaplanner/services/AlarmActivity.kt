@@ -1,14 +1,31 @@
 package com.pizzaplanner.services
 
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.pizzaplanner.R
 import com.pizzaplanner.databinding.ActivityAlarmBinding
+import com.pizzaplanner.ui.settings.SettingsFragment
 
 class AlarmActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityAlarmBinding
+    private var mediaPlayer: MediaPlayer? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var volumeIncreaseRunnable: Runnable? = null
+    private var currentVolume = 0.1f
+    private val volumeIncreaseStep = 0.1f
+    private val volumeIncreaseDelay = 2000L // 2 seconds
+    private lateinit var sharedPreferences: android.content.SharedPreferences
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +49,8 @@ class AlarmActivity : AppCompatActivity() {
         
         setupAlarmDisplay()
         setupClickListeners()
+        initializeSettings()
+        startAlarm()
     }
     
     private fun setupAlarmDisplay() {
@@ -61,14 +80,137 @@ class AlarmActivity : AppCompatActivity() {
         }
     }
     
+    private fun initializeSettings() {
+        sharedPreferences = getSharedPreferences("pizza_planner_settings", Context.MODE_PRIVATE)
+    }
+    
+    private fun startAlarm() {
+        // Vibrate if enabled
+        if (sharedPreferences.getBoolean("vibration_enabled", true)) {
+            vibrate()
+        }
+        
+        // Play alarm sound
+        playAlarmSound()
+        
+        // Start volume increase if enabled
+        if (sharedPreferences.getBoolean("increasing_volume", true)) {
+            startVolumeIncrease()
+        }
+    }
+    
+    private fun vibrate() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        val vibrationPattern = longArrayOf(0, 500, 200, 500)
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val vibrationEffect = VibrationEffect.createWaveform(vibrationPattern, 0)
+            vibrator.vibrate(vibrationEffect)
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(vibrationPattern, 0)
+        }
+    }
+    
+    private fun playAlarmSound() {
+        try {
+            // Get the alarm sound URI from settings
+            val uriString = sharedPreferences.getString("alarm_sound_uri", null)
+            val alarmSoundUri = if (uriString != null) {
+                Uri.parse(uriString)
+            } else {
+                android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+            }
+            
+            // Create MediaPlayer
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .build()
+                )
+                setDataSource(this@AlarmActivity, alarmSoundUri)
+                prepareAsync()
+                
+                // Set initial volume if increasing volume is enabled
+                if (sharedPreferences.getBoolean("increasing_volume", true)) {
+                    setVolume(currentVolume, currentVolume)
+                }
+                
+                setOnPreparedListener {
+                    // Start playing
+                    start()
+                    
+                    // Set looping if repeat is enabled
+                    isLooping = sharedPreferences.getBoolean("alarm_repeat", true)
+                }
+                
+                setOnCompletionListener {
+                    // If repeat is enabled and not already looping, play again
+                    if (sharedPreferences.getBoolean("alarm_repeat", true) && !isLooping) {
+                        seekTo(0)
+                        start()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    private fun startVolumeIncrease() {
+        volumeIncreaseRunnable = object : Runnable {
+            override fun run() {
+                currentVolume = (currentVolume + volumeIncreaseStep).coerceAtMost(1.0f)
+                mediaPlayer?.setVolume(currentVolume, currentVolume)
+                
+                // Continue increasing volume until it reaches maximum
+                if (currentVolume < 1.0f) {
+                    handler.postDelayed(this, volumeIncreaseDelay)
+                }
+            }
+        }
+        
+        handler.post(volumeIncreaseRunnable!!)
+    }
+    
     private fun setupClickListeners() {
         binding.buttonDismiss.setOnClickListener {
+            stopAlarm()
             finish()
         }
         
         binding.buttonSnooze.setOnClickListener {
+            stopAlarm()
             // TODO: Implement snooze functionality
             finish()
         }
+    }
+    
+    private fun stopAlarm() {
+        // Stop media player
+        mediaPlayer?.let { player ->
+            if (player.isPlaying) {
+                player.stop()
+            }
+            player.release()
+            mediaPlayer = null
+        }
+        
+        // Stop volume increase handler
+        volumeIncreaseRunnable?.let {
+            handler.removeCallbacks(it)
+            volumeIncreaseRunnable = null
+        }
+        
+        // Stop vibration
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrator.cancel()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        stopAlarm()
     }
 }

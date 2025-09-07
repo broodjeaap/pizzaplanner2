@@ -366,6 +366,16 @@ class PlanningFragment : Fragment() {
                 put("dough_ball_size_g", doughBallSize.toDouble())
             }
             
+            // Ensure all recipe variables are present in the map with valid values
+            recipe.variables.forEach { variable ->
+                if (!updatedVariableValues.containsKey(variable.name)) {
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+                } else {
+                    // Constrain the value to valid range
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, updatedVariableValues[variable.name] ?: variable.defaultValue)
+                }
+            }
+            
             val timeline = timeCalculationService.calculateRecipeTimeline(
                 recipe,
                 updatedVariableValues,
@@ -431,6 +441,16 @@ class PlanningFragment : Fragment() {
                 put("dough_ball_size_g", doughBallSize.toDouble())
             }
             
+            // Ensure all recipe variables are present in the map with valid values
+            recipe.variables.forEach { variable ->
+                if (!updatedVariableValues.containsKey(variable.name)) {
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+                } else {
+                    // Constrain the value to valid range
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, updatedVariableValues[variable.name] ?: variable.defaultValue)
+                }
+            }
+            
             timeCalculationService.calculateRecipeTimeline(recipe, updatedVariableValues, targetTime)
             
             // TODO: Save to local storage/database
@@ -449,6 +469,16 @@ class PlanningFragment : Fragment() {
             val updatedVariableValues = variableValues.toMutableMap().apply {
                 put("dough_balls", numberOfDoughBalls.toDouble())
                 put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            // Ensure all recipe variables are present in the map with valid values
+            recipe.variables.forEach { variable ->
+                if (!updatedVariableValues.containsKey(variable.name)) {
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+                } else {
+                    // Constrain the value to valid range
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, updatedVariableValues[variable.name] ?: variable.defaultValue)
+                }
             }
             
             // Calculate ingredients using current time as target (doesn't matter for ingredients)
@@ -496,6 +526,16 @@ class PlanningFragment : Fragment() {
             val updatedVariableValues = variableValues.toMutableMap().apply {
                 put("dough_balls", numberOfDoughBalls.toDouble())
                 put("dough_ball_size_g", doughBallSize.toDouble())
+            }
+            
+            // Ensure all recipe variables are present in the map with valid values
+            recipe.variables.forEach { variable ->
+                if (!updatedVariableValues.containsKey(variable.name)) {
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+                } else {
+                    // Constrain the value to valid range
+                    updatedVariableValues[variable.name] = constrainVariableValue(variable.name, updatedVariableValues[variable.name] ?: variable.defaultValue)
+                }
             }
             
             val timeline = timeCalculationService.calculateRecipeTimeline(
@@ -579,6 +619,16 @@ class PlanningFragment : Fragment() {
             put("dough_ball_size_g", doughBallSize.toDouble())
         }
         
+        // Ensure all recipe variables are present in the map with valid values
+        recipe.variables.forEach { variable ->
+            if (!updatedVariableValues.containsKey(variable.name)) {
+                updatedVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+            } else {
+                // Constrain the value to valid range
+                updatedVariableValues[variable.name] = constrainVariableValue(variable.name, updatedVariableValues[variable.name] ?: variable.defaultValue)
+            }
+        }
+        
         val timeline = timeCalculationService.calculateRecipeTimeline(
             recipe,
             updatedVariableValues,
@@ -595,6 +645,19 @@ class PlanningFragment : Fragment() {
         recipe.variables.forEach { variable ->
             if (!tempVariableValues.containsKey(variable.name)) {
                 tempVariableValues[variable.name] = variable.defaultValue
+            } else {
+                // Constrain the value to valid range
+                tempVariableValues[variable.name] = constrainVariableValue(variable.name, tempVariableValues[variable.name] ?: variable.defaultValue)
+            }
+        }
+        
+        // Ensure all recipe variables are present in the map with valid values
+        recipe.variables.forEach { variable ->
+            if (!tempVariableValues.containsKey(variable.name)) {
+                tempVariableValues[variable.name] = constrainVariableValue(variable.name, variable.defaultValue)
+            } else {
+                // Constrain the value to valid range
+                tempVariableValues[variable.name] = constrainVariableValue(variable.name, tempVariableValues[variable.name] ?: variable.defaultValue)
             }
         }
         

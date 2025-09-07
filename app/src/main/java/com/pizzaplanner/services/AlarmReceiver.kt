@@ -1,23 +1,12 @@
 package com.pizzaplanner.services
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import com.pizzaplanner.ui.settings.SettingsFragment
 
 class AlarmReceiver : BroadcastReceiver() {
-    
-    companion object {
-        private const val CHANNEL_ID = "pizza_alarm_channel"
-        private const val NOTIFICATION_ID = 1001
-    }
     
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("AlarmReceiver", "Alarm received")
@@ -39,9 +28,9 @@ class AlarmReceiver : BroadcastReceiver() {
                 return
             }
             "Notification Only" -> {
-                // Show regular notification only
+                // Show regular notification only using NotificationService
                 Log.d("AlarmReceiver", "Showing regular notification only")
-                showRegularNotification(context, stepName, message)
+                showRegularNotification(context, stepName, message, alarmType)
             }
             else -> {
                 // Full Screen Alarm (default) - show full-screen intent notification
@@ -51,42 +40,13 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
     
-    private fun showRegularNotification(context: Context, stepName: String, message: String) {
-        // Create notification channel if needed
-        createNotificationChannel(context)
-        
-        // Create intent to launch MainActivity when notification is tapped
-        val mainIntent = Intent(context, com.pizzaplanner.MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            System.currentTimeMillis().toInt(),
-            mainIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        // Build regular notification
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(com.pizzaplanner.R.drawable.ic_alarm)
-            .setContentTitle(stepName)
-            .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-        
-        // Show notification
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
+    private fun showRegularNotification(context: Context, stepName: String, message: String, alarmType: String) {
+        // Use NotificationService to show notification
+        val notificationService = NotificationService(context)
+        notificationService.showStepNotification(stepName, message, alarmType)
     }
     
     private fun showFullScreenNotification(context: Context, stepName: String, message: String, alarmType: String) {
-        // Create notification channel if needed
-        createNotificationChannel(context)
-        
         // Create intent to launch AlarmActivity when notification is tapped
         val alarmIntent = Intent(context, com.pizzaplanner.services.AlarmActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -95,43 +55,33 @@ class AlarmReceiver : BroadcastReceiver() {
             putExtra("alarm_type", alarmType)
         }
         
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            System.currentTimeMillis().toInt(),
-            alarmIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        // Use NotificationService to show notification with full-screen intent
+        val notificationService = NotificationService(context)
+        // We still need to create the notification with full-screen intent manually
+        // because NotificationService doesn't handle full-screen intents
         
-        // Build notification with full-screen intent
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        // Create notification channel if needed (NotificationService handles this)
+        // For full-screen intent, we need to create the notification manually
+        val notification = androidx.core.app.NotificationCompat.Builder(context, NotificationService.CHANNEL_ID)
             .setSmallIcon(com.pizzaplanner.R.drawable.ic_alarm)
             .setContentTitle(stepName)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setFullScreenIntent(pendingIntent, true) // This is the key for full-screen display
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(
+                android.app.PendingIntent.getActivity(
+                    context,
+                    System.currentTimeMillis().toInt(),
+                    alarmIntent,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                ),
+                true
+            )
             .setAutoCancel(true)
             .build()
         
         // Show notification
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-    
-    private fun createNotificationChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = android.app.NotificationChannel(
-                CHANNEL_ID,
-                "Pizza Alarm Notifications",
-                android.app.NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifications for pizza recipe steps"
-                enableVibration(true)
-                enableLights(true)
-            }
-            
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        notificationManager.notify(NotificationService.NOTIFICATION_ID_BASE + stepName.hashCode(), notification)
     }
 }

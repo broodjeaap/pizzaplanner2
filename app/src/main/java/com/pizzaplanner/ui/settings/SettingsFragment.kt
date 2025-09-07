@@ -33,6 +33,8 @@ class SettingsFragment : Fragment() {
         private const val KEY_AUTO_UPDATE_RECIPES = "auto_update_recipes"
         private const val KEY_DEFAULT_RISE_TIME = "default_rise_time"
         private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
+        private const val KEY_ALARM_REPEAT = "alarm_repeat"
+        private const val KEY_INCREASING_VOLUME = "increasing_volume"
         
         // Default values
         private const val DEFAULT_RISE_TIME = 24.0 // hours
@@ -40,6 +42,8 @@ class SettingsFragment : Fragment() {
         private const val DEFAULT_AUTO_UPDATE = true
         private const val DEFAULT_KEEP_SCREEN_ON = false
         private const val DEFAULT_NOTIFICATION_STYLE = "Full Screen Alarm"
+        private const val DEFAULT_ALARM_REPEAT = true
+        private const val DEFAULT_INCREASING_VOLUME = true
     }
     
     // Activity result launcher for ringtone picker
@@ -112,6 +116,16 @@ class SettingsFragment : Fragment() {
             saveKeepScreenOnSetting(isChecked)
         }
         
+        // Alarm repeat toggle
+        binding.switchAlarmRepeat.setOnCheckedChangeListener { _, isChecked ->
+            saveAlarmRepeatSetting(isChecked)
+        }
+        
+        // Increasing volume toggle
+        binding.switchIncreasingVolume.setOnCheckedChangeListener { _, isChecked ->
+            saveIncreasingVolumeSetting(isChecked)
+        }
+        
         // Reset settings button
         binding.buttonResetSettings.setOnClickListener {
             showResetSettingsDialog()
@@ -142,6 +156,14 @@ class SettingsFragment : Fragment() {
         // Load keep screen on setting
         val keepScreenOn = sharedPreferences.getBoolean(KEY_KEEP_SCREEN_ON, DEFAULT_KEEP_SCREEN_ON)
         binding.switchKeepScreenOn.isChecked = keepScreenOn
+        
+        // Load alarm repeat setting
+        val alarmRepeat = sharedPreferences.getBoolean(KEY_ALARM_REPEAT, DEFAULT_ALARM_REPEAT)
+        binding.switchAlarmRepeat.isChecked = alarmRepeat
+        
+        // Load increasing volume setting
+        val increasingVolume = sharedPreferences.getBoolean(KEY_INCREASING_VOLUME, DEFAULT_INCREASING_VOLUME)
+        binding.switchIncreasingVolume.isChecked = increasingVolume
     }
     
     private fun openRingtonePicker() {
@@ -258,6 +280,18 @@ class SettingsFragment : Fragment() {
             .apply()
     }
     
+    private fun saveAlarmRepeatSetting(enabled: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean(KEY_ALARM_REPEAT, enabled)
+            .apply()
+    }
+    
+    private fun saveIncreasingVolumeSetting(enabled: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean(KEY_INCREASING_VOLUME, enabled)
+            .apply()
+    }
+    
     private fun showResetSettingsDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Reset All Settings")
@@ -274,6 +308,8 @@ class SettingsFragment : Fragment() {
         loadSettings()
         Toast.makeText(requireContext(), "Settings reset to defaults", Toast.LENGTH_SHORT).show()
     }
+    
+    // Public methods for other parts of the app to access settings
     
     // Public methods for other parts of the app to access settings
     fun getVibrationEnabled(): Boolean {
@@ -294,6 +330,14 @@ class SettingsFragment : Fragment() {
     
     fun getKeepScreenOnEnabled(): Boolean {
         return sharedPreferences.getBoolean(KEY_KEEP_SCREEN_ON, DEFAULT_KEEP_SCREEN_ON)
+    }
+    
+    fun getAlarmRepeatEnabled(): Boolean {
+        return sharedPreferences.getBoolean(KEY_ALARM_REPEAT, DEFAULT_ALARM_REPEAT)
+    }
+    
+    fun getIncreasingVolumeEnabled(): Boolean {
+        return sharedPreferences.getBoolean(KEY_INCREASING_VOLUME, DEFAULT_INCREASING_VOLUME)
     }
 
     override fun onDestroyView() {

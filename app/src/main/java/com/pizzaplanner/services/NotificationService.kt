@@ -5,7 +5,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.pizzaplanner.MainActivity
@@ -19,6 +21,7 @@ class NotificationService(private val context: Context) {
     }
     
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("pizza_planner_settings", Context.MODE_PRIVATE)
     
     init {
         createNotificationChannel()
@@ -51,7 +54,13 @@ class NotificationService(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        // Get alarm sound from settings
+        val alarmSoundUri = getAlarmSoundUri()
+        
+        // Get vibration setting
+        val vibrationEnabled = sharedPreferences.getBoolean("vibration_enabled", true)
+        
+        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_recipes)
             .setContentTitle(stepName)
             .setContentText(message)
@@ -59,12 +68,26 @@ class NotificationService(private val context: Context) {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-            .setVibrate(longArrayOf(0, 500, 200, 500))
-            .build()
+            .setSound(alarmSoundUri)
+        
+        // Add vibration if enabled
+        if (vibrationEnabled) {
+            notificationBuilder.setVibrate(longArrayOf(0, 500, 200, 500))
+        }
+        
+        val notification = notificationBuilder.build()
         
         val notificationId = NOTIFICATION_ID_BASE + stepName.hashCode()
         notificationManager.notify(notificationId, notification)
+    }
+    
+    private fun getAlarmSoundUri(): Uri? {
+        val uriString = sharedPreferences.getString("alarm_sound_uri", null)
+        return if (uriString != null) {
+            Uri.parse(uriString)
+        } else {
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        }
     }
     
     fun cancelNotification(stepName: String) {
