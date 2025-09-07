@@ -1,3 +1,11 @@
+# 🔔 This app is 'vibe coded' 🔔
+
+My other app, just plain  PizzaPlanner`, was getting warnings from Google that it was becoming outdated, I've been meaning to give it an update, but never had the time...
+So I decided it wouldn't be a bad non-trivial app to [vibe code](https://en.wikipedia.org/wiki/Vibe_coding), and... it was.
+I've been both impressed and horrified at what it was doing, but here is the end result, not to bad for a few nights of prompting and ~20 dollars worth of credits (OpenRouter/KiloCode)
+
+Anyhow, everything else in this repo is pretty much exclusively created by AI.
+
 # Pizza Planner - Android App
 
 A comprehensive Android application for planning and managing pizza dough preparation with customizable recipes, variable timing, and intelligent alarm system.
