@@ -1,0 +1,51 @@
+package net.broodjeaap.pizzaplanner2.data.models
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import java.time.LocalDateTime
+
+@Parcelize
+data class PlannedRecipe(
+    val id: String,
+    val recipeId: String,
+    val recipeName: String,
+    val targetCompletionTime: LocalDateTime,
+    val startTime: LocalDateTime,
+    val variableValues: Map<String, Double>,
+    val status: RecipeStatus = RecipeStatus.SCHEDULED,
+    val currentStepIndex: Int = 0,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val eventName: String? = null,
+    val notes: String? = null
+) : Parcelable
+
+@Parcelize
+enum class RecipeStatus : Parcelable {
+    SCHEDULED,
+    IN_PROGRESS,
+    PAUSED,
+    COMPLETED,
+    CANCELLED
+}
+
+
+@Parcelize
+data class RecipeProgress(
+    val plannedRecipeId: String,
+    val stepId: String,
+    val stepName: String,
+    val scheduledStartTime: LocalDateTime,
+    val actualStartTime: LocalDateTime? = null,
+    val estimatedEndTime: LocalDateTime,
+    val actualEndTime: LocalDateTime? = null,
+    val status: StepStatus = StepStatus.PENDING,
+    val notes: String? = null
+) : Parcelable
+
+@Parcelize
+enum class StepStatus : Parcelable {
+    PENDING,
+    IN_PROGRESS,
+    COMPLETED,
+    SKIPPED
+}

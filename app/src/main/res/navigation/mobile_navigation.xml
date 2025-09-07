@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_recipes"
-        android:name="com.pizzaplanner.ui.recipes.RecipesFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.recipes.RecipesFragment"
         android:label="@string/nav_recipes"
         tools:layout="@layout/fragment_recipes">
         <action
@@ -17,12 +17,12 @@
 
     <fragment
         android:id="@+id/navigation_recipe_detail"
-        android:name="com.pizzaplanner.ui.recipes.RecipeDetailFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.recipes.RecipeDetailFragment"
         android:label="Recipe Detail"
         tools:layout="@layout/fragment_recipe_detail">
         <argument
             android:name="recipe"
-            app:argType="com.pizzaplanner.data.models.Recipe" />
+            app:argType="net.broodjeaap.pizzaplanner2.data.models.Recipe" />
         <action
             android:id="@+id/action_recipe_detail_to_planning_with_recipe"
             app:destination="@id/navigation_planning" />
@@ -30,19 +30,19 @@
 
     <fragment
         android:id="@+id/navigation_planning"
-        android:name="com.pizzaplanner.ui.planning.PlanningFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.planning.PlanningFragment"
         android:label="@string/nav_planning"
         tools:layout="@layout/fragment_planning">
         <argument
             android:name="recipe"
-            app:argType="com.pizzaplanner.data.models.Recipe"
+            app:argType="net.broodjeaap.pizzaplanner2.data.models.Recipe"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_active"
-        android:name="com.pizzaplanner.ui.active.ActiveFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.active.ActiveFragment"
         android:label="@string/nav_active"
         tools:layout="@layout/fragment_active_list">
         <action
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/navigation_active_recipe_detail"
-        android:name="com.pizzaplanner.ui.active.ActiveRecipeDetailFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeDetailFragment"
         android:label="Active Recipe Detail"
         tools:layout="@layout/fragment_active">
         <argument
@@ -62,7 +62,7 @@
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.pizzaplanner.ui.settings.SettingsFragment"
+        android:name="net.broodjeaap.pizzaplanner2.ui.settings.SettingsFragment"
         android:label="@string/nav_settings"
         tools:layout="@layout/fragment_settings" />
 

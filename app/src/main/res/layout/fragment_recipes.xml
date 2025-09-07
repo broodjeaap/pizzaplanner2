@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".ui.recipes.RecipesFragment">
+    tools:context="net.broodjeaap.pizzaplanner2.ui.recipes.RecipesFragment">
 
     <TextView
         android:id="@+id/textViewTitle"

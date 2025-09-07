@@ -27,7 +27,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name="net.broodjeaap.pizzaplanner2.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.PizzaPlanner">
             <intent-filter>
@@ -38,26 +38,26 @@
 
         <!-- Alarm Receiver -->
         <receiver
-            android:name=".services.AlarmReceiver"
+            android:name="net.broodjeaap.pizzaplanner2.services.AlarmReceiver"
             android:enabled="true"
             android:exported="false" />
 
         <!-- Alarm Service -->
         <service
-            android:name=".services.AlarmService"
+            android:name="net.broodjeaap.pizzaplanner2.services.AlarmService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
         <!-- Recipe Download Service -->
         <service
-            android:name=".services.RecipeDownloadService"
+            android:name="net.broodjeaap.pizzaplanner2.services.RecipeDownloadService"
             android:enabled="true"
             android:exported="false" />
 
         <!-- Alarm Activity -->
         <activity
-            android:name=".services.AlarmActivity"
+            android:name="net.broodjeaap.pizzaplanner2.services.AlarmActivity"
             android:exported="false"
             android:theme="@style/Theme.PizzaPlanner.FullScreen"
             android:launchMode="singleTop"

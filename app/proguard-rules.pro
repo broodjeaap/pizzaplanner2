@@ -24,7 +24,7 @@
 -keep class org.yaml.snakeyaml.** { *; }
 
 # Keep data classes
--keep class com.pizzaplanner.data.models.** { *; }
+-keep class net.broodjeaap.pizzaplanner2.data.models.** { *; }
 
 # Keep Parcelable classes
 -keepclassmembers class * implements android.os.Parcelable {
