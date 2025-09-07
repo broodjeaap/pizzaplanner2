@@ -173,8 +173,8 @@ class TimeCalculationService {
         val doughBalls = variableValues["dough_balls"] ?: 1.0
         val doughBallSize = variableValues["dough_ball_size_g"] ?: 250.0
         
-        // Base reference: 4 dough balls of 250g each = 1000g total
-        val baseTotalDoughWeight = 4.0 * 250.0
+        // Base reference: 1 dough ball of 250g = 250g total
+        val baseTotalDoughWeight = 1.0 * 250.0
         val currentTotalDoughWeight = doughBalls * doughBallSize
         val scalingFactor = currentTotalDoughWeight / baseTotalDoughWeight
         
@@ -192,36 +192,3 @@ class TimeCalculationService {
     }
     
 }
-
-data class RecipeTimeline(
-    val recipe: Recipe,
-    val variableValues: Map<String, Double>,
-    val startTime: LocalDateTime,
-    val targetCompletionTime: LocalDateTime,
-    val totalDurationMinutes: Int,
-    val steps: List<StepTimeline>,
-    val ingredients: List<ProcessedIngredient> = emptyList()
-)
-
-data class ProcessedStep(
-    val step: RecipeStep,
-    val durationMinutes: Int,
-    val processedDescription: String,
-    val processedTemperature: String?
-)
-
-data class StepTimeline(
-    val step: RecipeStep,
-    val processedDescription: String,
-    val processedTemperature: String?,
-    val durationMinutes: Int,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime
-)
-
-data class ProcessedIngredient(
-    val name: String,
-    val amount: Double,
-    val unit: String,
-    val category: String?
-)

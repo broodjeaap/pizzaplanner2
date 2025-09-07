@@ -10,7 +10,7 @@ import com.google.gson.stream.JsonWriter
 import com.google.gson.reflect.TypeToken
 import com.pizzaplanner.data.models.*
 import com.pizzaplanner.data.models.AlarmEvent
-import com.pizzaplanner.utils.RecipeTimeline
+import com.pizzaplanner.data.models.RecipeTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

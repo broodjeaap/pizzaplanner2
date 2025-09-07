@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.databinding.ItemIngredientBinding
-import com.pizzaplanner.utils.ProcessedIngredient
+import com.pizzaplanner.data.models.ProcessedIngredient
 
 class IngredientsAdapter : ListAdapter<ProcessedIngredient, IngredientsAdapter.ViewHolder>(DiffCallback()) {
 
@@ -35,10 +35,16 @@ class IngredientsAdapter : ListAdapter<ProcessedIngredient, IngredientsAdapter.V
                         String.format("%.2f kg", ingredient.amount / 1000.0)
                     }
                     (ingredient.unit == "g" || ingredient.unit == "ml") -> {
-                        String.format("%.0f %s", ingredient.amount, ingredient.unit)
+                        if (ingredient.amount < 1) {
+                            String.format("%.2f %s", ingredient.amount, ingredient.unit)
+                        } else {
+                            String.format("%.0f %s", ingredient.amount, ingredient.unit)
+                        }
                     }
                     else -> {
-                        if (ingredient.amount == ingredient.amount.toInt().toDouble()) {
+                        if (ingredient.amount < 1) {
+                            String.format("%.2f %s", ingredient.amount, ingredient.unit)
+                        } else if (ingredient.amount == ingredient.amount.toInt().toDouble()) {
                             String.format("%.0f %s", ingredient.amount, ingredient.unit)
                         } else {
                             String.format("%.1f %s", ingredient.amount, ingredient.unit)

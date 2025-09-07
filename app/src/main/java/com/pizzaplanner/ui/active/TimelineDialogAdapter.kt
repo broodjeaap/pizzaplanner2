@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pizzaplanner.R
 import com.pizzaplanner.databinding.ItemTimelineStepDialogBinding
 import com.pizzaplanner.utils.MarkdownUtils
-import com.pizzaplanner.utils.StepTimeline
+import com.pizzaplanner.data.models.StepTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

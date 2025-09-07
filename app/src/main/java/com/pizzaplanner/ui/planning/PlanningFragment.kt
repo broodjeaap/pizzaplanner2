@@ -54,7 +54,7 @@ class PlanningFragment : Fragment() {
     private val variableValues = mutableMapOf<String, Double>()
     
     // Dough ball configuration values
-    private var numberOfDoughBalls: Int = 4
+    private var numberOfDoughBalls: Int = 1
     private var doughBallSize: Int = 250
     
     private val timeCalculationService = TimeCalculationService()

@@ -17,7 +17,7 @@ import com.pizzaplanner.data.repository.PlannedRecipeRepository
 import com.pizzaplanner.databinding.FragmentActiveBinding
 import com.pizzaplanner.databinding.DialogTimelineBinding
 import com.pizzaplanner.services.AlarmService
-import com.pizzaplanner.utils.RecipeTimeline
+import com.pizzaplanner.data.models.RecipeTimeline
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
