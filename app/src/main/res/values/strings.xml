@@ -1,5 +1,19 @@
 <resources>
     <string name="app_name">Pizza Planner</string>
+    <string name="notes">Notes</string>
+    <string name="step_details">Step Details</string>
+    <string name="close">Close</string>
+    <string name="description">Description</string>
+    <string name="timing">Timing</string>
+    <string name="duration">Duration</string>
+    <string name="temperature">Temperature</string>
+    <string name="at_start">At start</string>
+    <string name="after_previous_step">After previous step</string>
+    <string name="in_parallel">In parallel</string>
+    <string name="scheduled_timing">Scheduled timing</string>
+    <string name="duration_minutes">%1$d minutes</string>
+    <string name="duration_hours">%1$d hours</string>
+    <string name="duration_hours_minutes">%1$d hours %2$d minutes</string>
     
     <!-- Navigation -->
     <string name="nav_recipes">Recipes</string>

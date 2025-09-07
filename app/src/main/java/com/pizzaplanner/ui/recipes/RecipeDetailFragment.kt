@@ -12,8 +12,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.pizzaplanner.R
 import com.pizzaplanner.data.models.Recipe
+import com.pizzaplanner.data.models.RecipeStep
+import com.pizzaplanner.data.models.StepTiming
 import com.pizzaplanner.databinding.FragmentRecipeDetailBinding
+import com.pizzaplanner.databinding.DialogStepDetailBinding
 import com.pizzaplanner.utils.MarkdownUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class RecipeDetailFragment : Fragment() {
 
@@ -81,7 +85,9 @@ class RecipeDetailFragment : Fragment() {
         variablesAdapter.submitList(recipe.variables)
 
         // Steps RecyclerView
-        stepsAdapter = RecipeStepsAdapter()
+        stepsAdapter = RecipeStepsAdapter { step ->
+            showStepDetailDialog(step)
+        }
         binding.recyclerViewSteps.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = stepsAdapter
@@ -100,6 +106,66 @@ class RecipeDetailFragment : Fragment() {
         binding.buttonBack.setOnClickListener {
             findNavController().navigateUp()
         }
+    }
+
+    private fun showStepDetailDialog(step: RecipeStep) {
+        val dialogBinding = DialogStepDetailBinding.inflate(layoutInflater)
+        
+        // Set step details
+        dialogBinding.textViewStepTitle.text = step.name
+        MarkdownUtils.setMarkdownText(dialogBinding.textViewStepDescription, step.description)
+        
+        // Set timing
+        dialogBinding.textViewStepTiming.text = when (step.timing) {
+            StepTiming.START -> getString(R.string.at_start)
+            StepTiming.AFTER_PREVIOUS -> getString(R.string.after_previous_step)
+            StepTiming.PARALLEL -> getString(R.string.in_parallel)
+            StepTiming.SCHEDULED -> getString(R.string.scheduled_timing)
+        }
+        
+        // Set duration
+        step.durationMinutes?.let { duration ->
+            dialogBinding.textViewStepDuration.text = when {
+                duration < 60 -> getString(R.string.duration_minutes, duration)
+                duration % 60 == 0 -> getString(R.string.duration_hours, duration / 60)
+                else -> getString(R.string.duration_hours_minutes, duration / 60, duration % 60)
+            }
+            dialogBinding.textViewStepDurationLabel.visibility = View.VISIBLE
+            dialogBinding.textViewStepDuration.visibility = View.VISIBLE
+        } ?: run {
+            dialogBinding.textViewStepDurationLabel.visibility = View.GONE
+            dialogBinding.textViewStepDuration.visibility = View.GONE
+        }
+        
+        // Set temperature
+        step.temperature?.let { temperature ->
+            dialogBinding.textViewStepTemperature.text = temperature
+            dialogBinding.textViewStepTemperatureLabel.visibility = View.VISIBLE
+            dialogBinding.textViewStepTemperature.visibility = View.VISIBLE
+        } ?: run {
+            dialogBinding.textViewStepTemperatureLabel.visibility = View.GONE
+            dialogBinding.textViewStepTemperature.visibility = View.GONE
+        }
+        
+        // Set notes
+        step.notes?.let { notes ->
+            MarkdownUtils.setMarkdownText(dialogBinding.textViewStepNotes, notes)
+            dialogBinding.textViewStepNotesLabel.visibility = View.VISIBLE
+            dialogBinding.textViewStepNotes.visibility = View.VISIBLE
+        } ?: run {
+            dialogBinding.textViewStepNotesLabel.visibility = View.GONE
+            dialogBinding.textViewStepNotes.visibility = View.GONE
+        }
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+        
+        dialogBinding.buttonClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
 
     override fun onDestroyView() {

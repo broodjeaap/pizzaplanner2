@@ -40,7 +40,8 @@ recipes:
     steps:
       - id: "make_dough"
         name: "Make the dough"
-        description: "Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast."
+        description: >
+          Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast.
         duration_formula: "room_temp_rise_hours * 60"
         timing: "start"
         notes: "See videos: [Pizza Dough | Basics with Babish](https://www.youtube.com/watch?v=n1O3uHPCOLA) and [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)"

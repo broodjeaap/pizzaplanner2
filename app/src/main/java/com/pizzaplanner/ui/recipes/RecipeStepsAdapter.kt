@@ -9,8 +9,11 @@ import com.pizzaplanner.data.models.RecipeStep
 import com.pizzaplanner.data.models.StepTiming
 import com.pizzaplanner.databinding.ItemRecipeStepBinding
 import com.pizzaplanner.utils.MarkdownUtils
+import android.view.View
 
-class RecipeStepsAdapter : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHolder>(StepDiffCallback()) {
+class RecipeStepsAdapter(
+    private val onStepClickListener: ((RecipeStep) -> Unit)? = null
+) : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHolder>(StepDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StepViewHolder {
         val binding = ItemRecipeStepBinding.inflate(
@@ -47,6 +50,21 @@ class RecipeStepsAdapter : ListAdapter<RecipeStep, RecipeStepsAdapter.StepViewHo
                     textViewStepDuration.visibility = android.view.View.VISIBLE
                 } ?: run {
                     textViewStepDuration.visibility = android.view.View.GONE
+                }
+                
+                // Show notes if available
+                step.notes?.let { notes ->
+                    textViewStepNotesLabel.visibility = android.view.View.VISIBLE
+                    textViewStepNotes.visibility = android.view.View.VISIBLE
+                    MarkdownUtils.setMarkdownText(textViewStepNotes, notes)
+                } ?: run {
+                    textViewStepNotesLabel.visibility = android.view.View.GONE
+                    textViewStepNotes.visibility = android.view.View.GONE
+                }
+                
+                // Set click listener
+                root.setOnClickListener {
+                    onStepClickListener?.invoke(step)
                 }
             }
         }

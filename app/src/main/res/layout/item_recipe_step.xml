@@ -6,7 +6,10 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     app:cardElevation="2dp"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,6 +54,30 @@
                 android:textAppearance="?attr/textAppearanceBody2"
                 android:layout_marginBottom="8dp"
                 tools:text="Combine flour, water, salt, and yeast in a large bowl. Mix until a shaggy dough forms." />
+
+            <!-- Notes Section -->
+            <TextView
+                android:id="@+id/textViewStepNotesLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/notes"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/textViewStepNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                tools:text="See video: [How to make dough balls](https://www.youtube.com/watch?v=oZxNbL5XB7w)"
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
