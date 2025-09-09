@@ -87,6 +87,9 @@ class YamlParser {
             val temperature = stepMap["temperature"] as? String
             val notes = stepMap["notes"] as? String
             
+            // Parse substeps if they exist
+            val substeps = parseSubsteps(stepMap["substeps"] as? List<Map<String, Any>> ?: emptyList())
+            
             val timing = when (timingString.lowercase()) {
                 "start" -> StepTiming.START
                 "parallel" -> StepTiming.PARALLEL
@@ -103,7 +106,20 @@ class YamlParser {
                 timing = timing,
                 isOptional = isOptional,
                 temperature = temperature,
-                notes = notes
+                notes = notes,
+                substeps = substeps
+            )
+        }
+    }
+    
+    private fun parseSubsteps(substepsData: List<Map<String, Any>>): List<RecipeSubstep> {
+        return substepsData.map { substepMap ->
+            val name = substepMap["name"] as String
+            val description = substepMap["description"] as? String ?: ""
+            
+            RecipeSubstep(
+                name = name,
+                description = description
             )
         }
     }

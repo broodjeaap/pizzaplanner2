@@ -44,7 +44,14 @@ data class RecipeStep(
     val timing: StepTiming,
     val isOptional: Boolean = false,
     val temperature: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
+    val substeps: List<RecipeSubstep> = emptyList()
+) : Parcelable
+
+@Parcelize
+data class RecipeSubstep(
+    val name: String,
+    val description: String
 ) : Parcelable
 
 @Parcelize

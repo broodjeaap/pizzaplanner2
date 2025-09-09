@@ -55,6 +55,27 @@
                 android:layout_marginBottom="8dp"
                 tools:text="Combine flour, water, salt, and yeast in a large bowl. Mix until a shaggy dough forms." />
 
+            <!-- Substeps Section -->
+            <TextView
+                android:id="@+id/textViewSubstepsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/substeps"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewSubsteps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Notes Section -->
             <TextView
                 android:id="@+id/textViewStepNotesLabel"
