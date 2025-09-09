@@ -16,6 +16,7 @@ import net.broodjeaap.pizzaplanner2.data.repository.PlannedRecipeRepository
 import net.broodjeaap.pizzaplanner2.databinding.FragmentActiveBinding
 import net.broodjeaap.pizzaplanner2.databinding.DialogTimelineBinding
 import net.broodjeaap.pizzaplanner2.services.AlarmService
+import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeStepsAdapter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -28,6 +29,9 @@ class ActiveRecipeDetailFragment : Fragment() {
     private lateinit var repository: PlannedRecipeRepository
     private var activeRecipeData: PlannedRecipeRepository.ActiveRecipeData? = null
     private var recipeId: String = ""
+    
+    // Adapter for displaying all steps
+    private lateinit var stepsAdapter: ActiveRecipeStepsAdapter
     
     // Timer for step countdown
     private var stepTimer: CountDownTimer? = null
@@ -49,6 +53,9 @@ class ActiveRecipeDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         repository = PlannedRecipeRepository(requireContext())
+        
+        // Initialize steps adapter
+        stepsAdapter = ActiveRecipeStepsAdapter(0)
         
         // Get recipe ID from arguments
         recipeId = arguments?.getString("recipeId") ?: ""
@@ -88,6 +95,10 @@ class ActiveRecipeDetailFragment : Fragment() {
             if (data.status == RecipeStatus.IN_PROGRESS && !data.isPaused) {
                 startStepTimer()
             }
+            // Update the steps adapter with the current step index
+            stepsAdapter = ActiveRecipeStepsAdapter(data.currentStepIndex)
+            binding.recyclerViewAllSteps.adapter = stepsAdapter
+            stepsAdapter.submitList(data.timeline.steps)
         }
     }
     
@@ -102,7 +113,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         showActiveRecipe()
         updateRecipeInfo(data)
         updateCurrentStep(data)
-        updateNextStep(data)
+        updateAllSteps(data)
         updateProgress(data)
     }
     
@@ -110,7 +121,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         binding.layoutEmptyState.visibility = View.VISIBLE
         binding.cardActiveRecipe.visibility = View.GONE
         binding.cardCurrentStep.visibility = View.GONE
-        binding.cardNextStep.visibility = View.GONE
+        binding.recyclerViewAllSteps.visibility = View.GONE
         binding.layoutRecipeActions.visibility = View.GONE
     }
     
@@ -118,7 +129,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         binding.layoutEmptyState.visibility = View.GONE
         binding.cardActiveRecipe.visibility = View.VISIBLE
         binding.cardCurrentStep.visibility = View.VISIBLE
-        binding.cardNextStep.visibility = View.VISIBLE
+        binding.recyclerViewAllSteps.visibility = View.VISIBLE
         binding.layoutRecipeActions.visibility = View.VISIBLE
     }
     
@@ -161,33 +172,6 @@ class ActiveRecipeDetailFragment : Fragment() {
         }
     }
     
-    private fun updateNextStep(data: PlannedRecipeRepository.ActiveRecipeData) {
-        val nextStepIndex = data.currentStepIndex + 1
-        if (nextStepIndex >= data.timeline.steps.size) {
-            binding.cardNextStep.visibility = View.GONE
-            return
-        }
-        
-        val nextStep = data.timeline.steps.getOrNull(nextStepIndex)
-        if (nextStep == null) {
-            binding.cardNextStep.visibility = View.GONE
-            return
-        }
-        
-        binding.textViewNextStepName.text = nextStep.step.name
-        
-        val startTime = nextStep.startTime
-        try {
-            val timeUntilNext = ChronoUnit.MINUTES.between(LocalDateTime.now(), startTime)
-            binding.textViewNextStepTime.text = when {
-                timeUntilNext <= 0 -> "Ready to start"
-                else -> "Starts in ${formatTimeRemaining(timeUntilNext)}"
-            }
-        } catch (e: Exception) {
-            binding.textViewNextStepTime.text = "Ready to start"
-        }
-    }
-    
     private fun updateProgress(data: PlannedRecipeRepository.ActiveRecipeData) {
         val totalSteps = data.timeline.steps.size
         val completedSteps = data.currentStepIndex
@@ -215,6 +199,21 @@ class ActiveRecipeDetailFragment : Fragment() {
         } else {
             binding.textViewTimeRemaining.text = "Unknown"
         }
+    }
+    
+    private fun updateAllSteps(data: PlannedRecipeRepository.ActiveRecipeData) {
+        // Set up the RecyclerView for all steps
+        binding.recyclerViewAllSteps.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = stepsAdapter
+        }
+        
+        // Update the adapter with the current step index
+        stepsAdapter = ActiveRecipeStepsAdapter(data.currentStepIndex)
+        binding.recyclerViewAllSteps.adapter = stepsAdapter
+        
+        // Submit the list of steps
+        stepsAdapter.submitList(data.timeline.steps)
     }
     
     private fun startStepTimer() {

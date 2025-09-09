@@ -248,55 +248,30 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Next Step Preview -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardNextStep"
+        <!-- All Steps -->
+        <TextView
+            android:id="@+id/textViewAllStepsTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp"
+            android:text="@string/all_steps"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardCurrentStep"
-            tools:visibility="visible">
+            app:layout_constraintTop_toBottomOf="@id/cardCurrentStep" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/next_step"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textViewNextStepName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    tools:text="Knead dough" />
-
-                <TextView
-                    android:id="@+id/textViewNextStepTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="?android:attr/textColorSecondary"
-                    tools:text="Starts in 30 minutes" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewAllSteps"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewAllStepsTitle"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_timeline_step" />
 
         <!-- Recipe Actions -->
         <LinearLayout
@@ -308,7 +283,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardNextStep"
+            app:layout_constraintTop_toBottomOf="@id/recyclerViewAllSteps"
             tools:visibility="visible">
 
             <com.google.android.material.button.MaterialButton
