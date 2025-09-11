@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import android.graphics.Typeface
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.broodjeaap.pizzaplanner2.R
 import net.broodjeaap.pizzaplanner2.data.models.*
@@ -17,6 +20,8 @@ import net.broodjeaap.pizzaplanner2.databinding.FragmentActiveBinding
 import net.broodjeaap.pizzaplanner2.databinding.DialogTimelineBinding
 import net.broodjeaap.pizzaplanner2.services.AlarmService
 import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeStepsAdapter
+import net.broodjeaap.pizzaplanner2.utils.MarkdownUtils
+import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeDetailFragmentDirections
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -60,6 +65,13 @@ class ActiveRecipeDetailFragment : Fragment() {
         // Get recipe ID from arguments
         recipeId = arguments?.getString("recipeId") ?: ""
         
+        // Set up fragment result listener for substeps completion
+        parentFragmentManager.setFragmentResultListener("substepsResult", this) { _, result ->
+            if (result.getBoolean("stepCompleted", false)) {
+                completeCurrentStep()
+            }
+        }
+        
         setupClickListeners()
         loadRecipe()
         updateUI()
@@ -68,6 +80,10 @@ class ActiveRecipeDetailFragment : Fragment() {
     private fun setupClickListeners() {
         binding.buttonPauseResume.setOnClickListener {
             togglePauseResume()
+        }
+        
+        binding.buttonStartStep.setOnClickListener {
+            showSubsteps()
         }
         
         binding.buttonCompleteStep.setOnClickListener {
@@ -156,6 +172,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         binding.buttonPauseResume.setIconResource(if (data.isPaused) R.drawable.ic_time else R.drawable.ic_pause)
     }
     
+    
     private fun updateCurrentStep(data: PlannedRecipeRepository.ActiveRecipeData) {
         if (data.currentStepIndex >= data.timeline.steps.size) return
         
@@ -170,8 +187,12 @@ class ActiveRecipeDetailFragment : Fragment() {
         } else {
             binding.layoutStepTimer.visibility = View.GONE
         }
+        
+        // Update substeps button visibility
+        binding.layoutSubstepsContainer.visibility = View.GONE
+        binding.buttonCompleteStep.visibility = if (currentStep.step.substeps.isEmpty()) View.GONE else View.VISIBLE
+        binding.buttonStartStep.text = if (currentStep.step.substeps.isEmpty()) getString(R.string.step_complete) else getString(R.string.start_step)
     }
-    
     private fun updateProgress(data: PlannedRecipeRepository.ActiveRecipeData) {
         val totalSteps = data.timeline.steps.size
         val completedSteps = data.currentStepIndex
@@ -427,6 +448,21 @@ class ActiveRecipeDetailFragment : Fragment() {
         }
         
         dialog.show()
+    }
+    
+    private fun showSubsteps() {
+        val data = activeRecipeData ?: return
+        if (data.currentStepIndex >= data.timeline.steps.size) return
+        
+        val currentStep = data.timeline.steps.getOrNull(data.currentStepIndex) ?: return
+        
+        // Navigate to substeps fragment
+        val action = ActiveRecipeDetailFragmentDirections.actionActiveRecipeDetailToSubsteps(
+            currentStep.step.name,
+            currentStep.step.substeps.toTypedArray(),
+            HashMap(data.timeline.variableValues)
+        )
+        findNavController().navigate(action)
     }
     
     override fun onDestroyView() {

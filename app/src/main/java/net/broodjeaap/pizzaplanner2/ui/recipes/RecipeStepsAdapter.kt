@@ -63,26 +63,6 @@ class RecipeStepsAdapter(
                     textViewStepNotes.visibility = android.view.View.GONE
                 }
                 
-                // Handle substeps
-                if (step.substeps.isNotEmpty()) {
-                    // Show substeps section
-                    textViewSubstepsLabel.visibility = android.view.View.VISIBLE
-                    recyclerViewSubsteps.visibility = android.view.View.VISIBLE
-                    
-                    // Set up substeps adapter
-                    val substepsAdapter = SubstepsAdapter()
-                    recyclerViewSubsteps.apply {
-                        this.adapter = substepsAdapter
-                        layoutManager = LinearLayoutManager(context)
-                        isNestedScrollingEnabled = false
-                    }
-                    substepsAdapter.submitList(step.substeps)
-                } else {
-                    // Hide substeps section
-                    textViewSubstepsLabel.visibility = android.view.View.GONE
-                    recyclerViewSubsteps.visibility = android.view.View.GONE
-                }
-                
                 // Set click listener
                 root.setOnClickListener {
                     onStepClickListener?.invoke(step)

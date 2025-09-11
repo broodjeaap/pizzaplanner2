@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Substep dimensions -->
+    <dimen name="substep_horizontal_padding">8dp</dimen>
+    <dimen name="substep_vertical_padding">4dp</dimen>
+</resources>

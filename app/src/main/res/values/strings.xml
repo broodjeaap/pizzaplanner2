@@ -112,6 +112,7 @@
     <string name="no_active_recipe">No active recipe</string>
     <string name="start_recipe_from_planning">Start a recipe from the Planning tab to track your progress here</string>
     <string name="all_steps">All Steps</string>
+    <string name="start_step">Start</string>
     
     <!-- Alarm Screen -->
     <string name="alarm_title_step">⏰ Time for Next Step</string>

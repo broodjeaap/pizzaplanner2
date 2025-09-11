@@ -218,6 +218,39 @@
 
                 </LinearLayout>
 
+                <!-- Substeps Container -->
+                <LinearLayout
+                    android:id="@+id/layoutSubstepsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/substeps"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                        android:textStyle="bold" />
+
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:maxHeight="200dp">
+
+                        <LinearLayout
+                            android:id="@+id/layoutSubsteps"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                    </androidx.core.widget.NestedScrollView>
+
+                </LinearLayout>
+
                 <!-- Step Actions -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -235,12 +268,22 @@
                         android:text="@string/skip_step" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonStartStep"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/start_step" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonCompleteStep"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="@string/step_complete" />
+                        android:text="@string/step_complete"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
 

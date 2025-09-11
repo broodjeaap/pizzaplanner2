@@ -83,6 +83,8 @@ dependencies {
     
     // Markdown rendering
     implementation 'io.noties.markwon:core:4.6.2'
+    implementation 'io.noties.markwon:image:4.6.2'
+    implementation 'io.noties.markwon:image-glide:4.6.2'
     
     // Image loading
     implementation 'com.github.bumptech.glide:glide:5.0.4'

@@ -58,6 +58,25 @@
         <argument
             android:name="recipeId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_active_recipe_detail_to_substeps"
+            app:destination="@id/navigation_substeps" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_substeps"
+        android:name="net.broodjeaap.pizzaplanner2.ui.active.SubstepsFragment"
+        android:label="Substeps"
+        tools:layout="@layout/fragment_substeps">
+        <argument
+            android:name="stepName"
+            app:argType="string" />
+        <argument
+            android:name="substeps"
+            app:argType="net.broodjeaap.pizzaplanner2.data.models.RecipeSubstep[]" />
+        <argument
+            android:name="variableValues"
+            app:argType="java.io.Serializable" />
     </fragment>
 
     <fragment
