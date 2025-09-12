@@ -13,12 +13,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import net.broodjeaap.pizzaplanner2.R
 import net.broodjeaap.pizzaplanner2.data.models.RecipeSubstep
+import net.broodjeaap.pizzaplanner2.data.repository.PlannedRecipeRepository
 import net.broodjeaap.pizzaplanner2.utils.MarkdownUtils
 import java.util.HashMap
 
 class SubstepsFragment : Fragment() {
 
     private val args: SubstepsFragmentArgs by navArgs()
+    private lateinit var repository: PlannedRecipeRepository
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,12 +35,31 @@ class SubstepsFragment : Fragment() {
         
         // Set up back button
         toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            // Set result to indicate step completion for back button as well
+            val result = Bundle().apply {
+                putBoolean("stepCompleted", true)
+            }
+            parentFragmentManager.setFragmentResult("substepsResult", result)
+            
+            // Explicitly pop the back stack
+            findNavController().popBackStack()
         }
         
-        // Display substeps
+        // Display substeps or step description
         val layoutSubstepsContainer = view.findViewById<LinearLayout>(R.id.layout_substeps_container)
-        displaySubsteps(layoutSubstepsContainer, args.substeps.toList(), args.variableValues as Map<String, Double>)
+        val stepDescription = view.findViewById<TextView>(R.id.textViewStepDescription)
+        
+        if (args.substeps.isNotEmpty()) {
+            displaySubsteps(layoutSubstepsContainer, args.substeps.toList(), args.variableValues as Map<String, Double>)
+            stepDescription.visibility = View.GONE
+        } else {
+            // Show step description when there are no substeps
+            layoutSubstepsContainer.visibility = View.GONE
+            stepDescription.visibility = View.VISIBLE
+            // For steps without substeps, show a simple completion message
+            val message = "Ready to complete: ${args.stepName}\n\nTap 'Mark Completed' when this step is finished."
+            MarkdownUtils.setMarkdownText(stepDescription, message)
+        }
         
         // Set up "Mark Completed" button
         val markCompletedButton = view.findViewById<Button>(R.id.button_mark_completed)
@@ -49,8 +70,8 @@ class SubstepsFragment : Fragment() {
             }
             parentFragmentManager.setFragmentResult("substepsResult", result)
             
-            // Navigate back to the previous screen
-            findNavController().navigateUp()
+            // Explicitly pop the back stack
+            findNavController().popBackStack()
         }
         
         return view

@@ -65,16 +65,51 @@ class ActiveRecipeDetailFragment : Fragment() {
         // Get recipe ID from arguments
         recipeId = arguments?.getString("recipeId") ?: ""
         
+        // Get step ID from arguments if present (for alarm navigation)
+        val stepId = arguments?.getString("stepId")
+        
         // Set up fragment result listener for substeps completion
         parentFragmentManager.setFragmentResultListener("substepsResult", this) { _, result ->
             if (result.getBoolean("stepCompleted", false)) {
                 completeCurrentStep()
             }
+
+            // Always pop the back stack to close substeps fragment
+            findNavController().popBackStack()
+
+            // Clear stepId argument if it exists
+            arguments?.remove("stepId")
         }
         
         setupClickListeners()
         loadRecipe()
         updateUI()
+
+        // If stepId is provided (from alarm), navigate to substeps for that step
+        stepId?.let { id ->
+            findStepIndexById(id)?.let { index ->
+                // Update current step to the specified step
+                repository.updateRecipe(recipeId) { currentData ->
+                    currentData.copy(currentStepIndex = index)
+                }
+                loadRecipe()
+                updateUI()
+                showSubsteps()
+
+                // Clear stepId from arguments to prevent re-triggering
+                arguments?.remove("stepId")
+            } ?: run {
+                Toast.makeText(requireContext(), "Step not found", Toast.LENGTH_SHORT).show()
+                arguments?.remove("stepId")
+            }
+        }
+    }
+    
+    private fun findStepIndexById(stepId: String): Int? {
+        activeRecipeData?.let { data ->
+            return data.timeline.steps.indexOfFirst { it.step.id == stepId }
+        }
+        return null
     }
     
     private fun setupClickListeners() {
@@ -456,13 +491,29 @@ class ActiveRecipeDetailFragment : Fragment() {
         
         val currentStep = data.timeline.steps.getOrNull(data.currentStepIndex) ?: return
         
-        // Navigate to substeps fragment
-        val action = ActiveRecipeDetailFragmentDirections.actionActiveRecipeDetailToSubsteps(
-            currentStep.step.name,
-            currentStep.step.substeps.toTypedArray(),
-            HashMap(data.timeline.variableValues)
-        )
-        findNavController().navigate(action)
+        // For steps with substeps, navigate to substeps fragment
+        if (currentStep.step.substeps.isNotEmpty()) {
+            val action = ActiveRecipeDetailFragmentDirections.actionActiveRecipeDetailToSubsteps(
+                currentStep.step.name,
+                currentStep.step.substeps.toTypedArray(),
+                HashMap(data.timeline.variableValues)
+            )
+            findNavController().navigate(action)
+        } else {
+            // For steps without substeps, show description in a dialog
+            showStepDescriptionDialog(currentStep.step.name, currentStep.processedDescription)
+        }
+    }
+    
+    private fun showStepDescriptionDialog(stepName: String, description: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(stepName)
+            .setMessage(description)
+            .setPositiveButton("Mark Completed") { _, _ ->
+                completeCurrentStep()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     override fun onDestroyView() {

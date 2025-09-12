@@ -34,7 +34,7 @@ class AlarmReceiver : BroadcastReceiver() {
             else -> {
                 // Full Screen Alarm (default) - show full-screen intent notification
                 Log.d("AlarmReceiver", "Showing full-screen notification")
-                showFullScreenNotification(context, stepName, message, alarmType)
+                showFullScreenNotification(context, intent)
             }
         }
     }
@@ -45,26 +45,21 @@ class AlarmReceiver : BroadcastReceiver() {
         notificationService.showStepNotification(stepName, message, alarmType)
     }
     
-    private fun showFullScreenNotification(context: Context, stepName: String, message: String, alarmType: String) {
+    private fun showFullScreenNotification(context: Context, intent: Intent) {
+        // Ensure notification channel is created
+        val notificationService = NotificationService(context)
+        
         // Create intent to launch AlarmActivity when notification is tapped
         val alarmIntent = Intent(context, net.broodjeaap.pizzaplanner2.services.AlarmActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("step_name", stepName)
-            putExtra("message", message)
-            putExtra("alarm_type", alarmType)
+            putExtras(intent)  // Copy all extras including recipe_id and step_id
         }
         
-        // Use NotificationService to show notification with full-screen intent
-        val notificationService = NotificationService(context)
-        // We still need to create the notification with full-screen intent manually
-        // because NotificationService doesn't handle full-screen intents
-        
-        // Create notification channel if needed (NotificationService handles this)
-        // For full-screen intent, we need to create the notification manually
+        // Create notification with full-screen intent
         val notification = androidx.core.app.NotificationCompat.Builder(context, NotificationService.CHANNEL_ID)
             .setSmallIcon(net.broodjeaap.pizzaplanner2.R.drawable.ic_alarm)
-            .setContentTitle(stepName)
-            .setContentText(message)
+            .setContentTitle(intent.getStringExtra("step_name") ?: "Recipe Step")
+            .setContentText(intent.getStringExtra("message") ?: "Time for next step!")
             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
             .setCategory(androidx.core.app.NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(
@@ -81,6 +76,7 @@ class AlarmReceiver : BroadcastReceiver() {
         
         // Show notification
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val stepName = intent.getStringExtra("step_name") ?: "Recipe Step"
         notificationManager.notify(NotificationService.NOTIFICATION_ID_BASE + stepName.hashCode(), notification)
     }
 }

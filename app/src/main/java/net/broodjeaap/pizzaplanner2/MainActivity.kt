@@ -1,6 +1,7 @@
 package net.broodjeaap.pizzaplanner2
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -38,6 +39,30 @@ class MainActivity : AppCompatActivity() {
 
         setupNavigation()
         requestNecessaryPermissions()
+
+        // Handle intent for alarm navigation
+        handleAlarmIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // Handle intent for alarm navigation
+        handleAlarmIntent(intent)
+    }
+
+    private fun handleAlarmIntent(intent: Intent?) {
+        intent ?: return
+        val recipeId = intent.getStringExtra("recipe_id")
+        val stepId = intent.getStringExtra("step_id")
+        if (recipeId != null && stepId != null) {
+            val navController = findNavController(R.id.nav_host_fragment_activity_main)
+            val bundle = Bundle().apply {
+                putString("recipeId", recipeId)
+                putString("stepId", stepId)
+            }
+            navController.navigate(R.id.navigation_active_recipe_detail, bundle)
+        }
     }
 
     private fun setupNavigation() {

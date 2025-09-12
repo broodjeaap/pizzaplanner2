@@ -1,6 +1,7 @@
 package net.broodjeaap.pizzaplanner2.services
 
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import net.broodjeaap.pizzaplanner2.MainActivity
 import net.broodjeaap.pizzaplanner2.R
 import net.broodjeaap.pizzaplanner2.databinding.ActivityAlarmBinding
 
@@ -176,6 +178,7 @@ class AlarmActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         binding.buttonDismiss.setOnClickListener {
             stopAlarm()
+            launchMainActivity()
             finish()
         }
         
@@ -184,6 +187,18 @@ class AlarmActivity : AppCompatActivity() {
             // TODO: Implement snooze functionality
             finish()
         }
+    }
+    
+    private fun launchMainActivity() {
+        val recipeId = intent.getStringExtra("recipe_id") ?: return
+        val stepId = intent.getStringExtra("step_id") ?: return
+        
+        val mainIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("recipe_id", recipeId)
+            putExtra("step_id", stepId)
+        }
+        startActivity(mainIntent)
     }
     
     private fun stopAlarm() {

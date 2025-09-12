@@ -556,7 +556,7 @@ class PlanningFragment : Fragment() {
             // Schedule alarms for recipe steps
             val alarmEvents = timeline.steps.map { step ->
                 AlarmEvent(
-                    id = "${plannedRecipe.id}_${step.step.id}",
+                    id = "${plannedRecipe.id}::${step.step.id}",
                     stepName = step.step.name,
                     message = step.processedDescription,
                     scheduledTime = step.startTime,

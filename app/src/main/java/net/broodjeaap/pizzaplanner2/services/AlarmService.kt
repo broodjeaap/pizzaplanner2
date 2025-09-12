@@ -25,11 +25,18 @@ class AlarmService : Service() {
     
     companion object {
         fun scheduleAlarm(context: Context, alarmEvent: AlarmEvent) {
+            // Parse recipeId and stepId from alarmEvent.id (format: recipeId::stepId)
+            val parts = alarmEvent.id.split("::")
+            val recipeId = if (parts.size > 1) parts[0] else ""
+            val stepId = if (parts.size > 1) parts[1] else ""
+            
             val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("step_name", alarmEvent.stepName)
                 putExtra("message", alarmEvent.message)
                 putExtra("alarm_type", alarmEvent.alarmType.name)
                 putExtra("alarm_id", alarmEvent.id)
+                putExtra("recipe_id", recipeId)
+                putExtra("step_id", stepId)
             }
             
             val pendingIntent = PendingIntent.getBroadcast(

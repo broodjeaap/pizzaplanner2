@@ -58,9 +58,14 @@
         <argument
             android:name="recipeId"
             app:argType="string" />
+        <argument
+            android:name="stepId"
+            app:argType="string" />
         <action
             android:id="@+id/action_active_recipe_detail_to_substeps"
-            app:destination="@id/navigation_substeps" />
+            app:destination="@id/navigation_substeps"
+            app:popUpTo="@id/navigation_active_recipe_detail"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment

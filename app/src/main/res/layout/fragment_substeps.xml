@@ -21,12 +21,27 @@
         android:layout_weight="1">
 
         <LinearLayout
-            android:id="@+id/layout_substeps_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp" />
+            android:orientation="vertical">
 
+            <!-- TextView for step description when no substeps exist -->
+            <TextView
+                android:id="@+id/textViewStepDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:visibility="gone" />
+
+            <!-- Container for substeps -->
+            <LinearLayout
+                android:id="@+id/layout_substeps_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp" />
+
+        </LinearLayout>
     </ScrollView>
 
     <Button
