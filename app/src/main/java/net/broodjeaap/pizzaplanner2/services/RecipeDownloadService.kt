@@ -23,7 +23,7 @@ class RecipeDownloadService : Service() {
     companion object {
         const val ACTION_DOWNLOAD_RECIPES = "net.broodjeaap.pizzaplanner2.DOWNLOAD_RECIPES"
         const val EXTRA_RECIPE_URL = "recipe_url"
-        const val DEFAULT_RECIPE_URL = "https://raw.githubusercontent.com/example/pizza-recipes/main/recipes.yaml"
+        const val DEFAULT_RECIPE_URL = "https://raw.githubusercontent.com/broodjeaap/pizzaplanner2/refs/heads/main/app/src/main/assets/recipes/pizza_recipes_converted.yaml"
     }
     
     override fun onBind(intent: Intent?): IBinder? = null
@@ -74,6 +74,7 @@ class RecipeDownloadService : Service() {
                         val successIntent = Intent("net.broodjeaap.pizzaplanner2.RECIPES_DOWNLOADED").apply {
                             putExtra("success", true)
                             putExtra("recipe_count", recipes.size)
+                            setPackage(packageName)
                         }
                         sendBroadcast(successIntent)
                         
@@ -89,6 +90,7 @@ class RecipeDownloadService : Service() {
                 val failureIntent = Intent("net.broodjeaap.pizzaplanner2.RECIPES_DOWNLOADED").apply {
                     putExtra("success", false)
                     putExtra("error", e.message)
+                    setPackage(packageName)
                 }
                 sendBroadcast(failureIntent)
             } finally {

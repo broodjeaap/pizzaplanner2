@@ -1,4 +1,55 @@
 recipes:
+  - id: "test_dough"
+    name: "Test Day Dough"
+    description: "A Neapolitan Style pizza prepared in a day."
+    difficulty: "Easy"
+    total_time_hours: 8
+    image_url: "https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_day_pizza.png"
+    variables:
+      - name: "room_temp_rise_hours"
+        display: "Room Temperature Rise (hours)"
+        default: 5
+        min: 4
+        max: 6
+        type: "integer"
+        unit: "hours"
+      - name: "dough_ball_rise_hours"
+        display: "Dough Ball Rise (hours)"
+        default: 2
+        min: 1
+        max: 4
+        type: "integer"
+        unit: "hours"
+    ingredients:
+      - name: "Flour"
+        amount: 149
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 92
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 4.5
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 5
+        unit: "g"
+        category: "leavening"
+    steps:
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine all the ingredients to make the dough, we start with just the water and salt and add the yeast after adding some of the flour to not kill the yeast."
+        duration_formula: "1"
+        timing: "start"
+        notes: "See videos: [Pizza Dough | Basics with Babish](https://www.youtube.com/watch?v=n1O3uHPCOLA) and [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)"
+      - id: "make_dough_balls"
+        name: "Making the dough balls"
+        description: "Split the dough into smaller dough balls and place the dough in a sealed/covered container at room temperature"
+        duration_minutes: 1
+        timing: "after_previous"
+        notes: "See video: [How to make dough balls](https://www.youtube.com/watch?v=oZxNbL5XB7w)"
   - id: "neapolitan_day_dough"
     name: "Neapolitan Day Dough"
     description: "A Neapolitan Style pizza prepared in a day."

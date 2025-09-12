@@ -1,6 +1,9 @@
 package net.broodjeaap.pizzaplanner2.ui.settings
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.net.Uri
@@ -10,10 +13,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.broodjeaap.pizzaplanner2.databinding.FragmentSettingsBinding
+import net.broodjeaap.pizzaplanner2.services.RecipeDownloadService
 import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
@@ -22,6 +27,27 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var sharedPreferences: SharedPreferences
+    
+    // BroadcastReceiver for recipe download results
+    private val recipeDownloadReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "net.broodjeaap.pizzaplanner2.RECIPES_DOWNLOADED") {
+                val success = intent.getBooleanExtra("success", false)
+                val error = intent.getStringExtra("error")
+                val recipeCount = intent.getIntExtra("recipe_count", 0)
+                
+                // Reset button state
+                binding.buttonDownloadRecipes.isEnabled = true
+                binding.buttonDownloadRecipes.text = "Check Now"
+                
+                if (success) {
+                    Toast.makeText(requireContext(), "Downloaded $recipeCount recipes", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Download failed: $error", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
     
     // Settings keys
     companion object {
@@ -73,6 +99,15 @@ class SettingsFragment : Fragment() {
         initializeSharedPreferences()
         setupClickListeners()
         loadSettings()
+        
+        // Register broadcast receiver for recipe download results
+        val filter = IntentFilter("net.broodjeaap.pizzaplanner2.RECIPES_DOWNLOADED")
+        ContextCompat.registerReceiver(
+            requireContext(),
+            recipeDownloadReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
     
     private fun initializeSharedPreferences() {
@@ -233,20 +268,16 @@ class SettingsFragment : Fragment() {
     }
     
     private fun checkForRecipeUpdates() {
-        // Simulate checking for recipe updates
+        // Start the actual RecipeDownloadService
         binding.buttonDownloadRecipes.isEnabled = false
-        binding.buttonDownloadRecipes.text = "Checking..."
+        binding.buttonDownloadRecipes.text = "Downloading..."
         
-        lifecycleScope.launch {
-            // Simulate network delay
-            kotlinx.coroutines.delay(2000)
-            
-            binding.buttonDownloadRecipes.isEnabled = true
-            binding.buttonDownloadRecipes.text = "Check Now"
-            
-            // Show result
-            Toast.makeText(requireContext(), "No new recipes available", Toast.LENGTH_SHORT).show()
+        val downloadIntent = Intent(requireContext(), RecipeDownloadService::class.java).apply {
+            action = RecipeDownloadService.ACTION_DOWNLOAD_RECIPES
+            putExtra(RecipeDownloadService.EXTRA_RECIPE_URL, RecipeDownloadService.DEFAULT_RECIPE_URL)
         }
+        
+        requireContext().startService(downloadIntent)
     }
     
     private fun showDefaultRiseTimeDialog() {
@@ -341,6 +372,12 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Unregister broadcast receiver
+        try {
+            requireContext().unregisterReceiver(recipeDownloadReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver was not registered, ignore
+        }
         _binding = null
     }
 }
