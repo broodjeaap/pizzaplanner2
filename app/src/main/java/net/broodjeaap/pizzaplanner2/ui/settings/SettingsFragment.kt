@@ -152,9 +152,6 @@ class SettingsFragment : Fragment() {
         }
         
         // Default rise time setting
-        binding.buttonSetDefaultRiseTime.setOnClickListener {
-            showDefaultRiseTimeDialog()
-        }
         
         // Keep screen on toggle
         binding.switchKeepScreenOn.setOnCheckedChangeListener { _, isChecked ->
@@ -194,9 +191,6 @@ class SettingsFragment : Fragment() {
         val autoUpdate = sharedPreferences.getBoolean(KEY_AUTO_UPDATE_RECIPES, DEFAULT_AUTO_UPDATE)
         binding.switchAutoUpdate.isChecked = autoUpdate
         
-        // Load default rise time
-        val defaultRiseTime = sharedPreferences.getFloat(KEY_DEFAULT_RISE_TIME, DEFAULT_RISE_TIME.toFloat())
-        binding.textViewDefaultRiseTimeValue.text = "${defaultRiseTime.toInt()} hours"
         
         // Load keep screen on setting
         val keepScreenOn = sharedPreferences.getBoolean(KEY_KEEP_SCREEN_ON, DEFAULT_KEEP_SCREEN_ON)
@@ -314,29 +308,6 @@ class SettingsFragment : Fragment() {
         requireContext().startService(downloadIntent)
     }
     
-    private fun showDefaultRiseTimeDialog() {
-        val currentRiseTime = sharedPreferences.getFloat(KEY_DEFAULT_RISE_TIME, DEFAULT_RISE_TIME.toFloat())
-        val options = arrayOf("12 hours", "18 hours", "24 hours", "36 hours", "48 hours")
-        val values = arrayOf(12f, 18f, 24f, 36f, 48f)
-        val currentIndex = values.indexOf(currentRiseTime).takeIf { it >= 0 } ?: 2 // Default to 24 hours
-        
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Default Rise Time")
-            .setSingleChoiceItems(options, currentIndex) { dialog, which ->
-                val selectedValue = values[which]
-                saveDefaultRiseTime(selectedValue)
-                binding.textViewDefaultRiseTimeValue.text = "${selectedValue.toInt()} hours"
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-    
-    private fun saveDefaultRiseTime(hours: Float) {
-        sharedPreferences.edit()
-            .putFloat(KEY_DEFAULT_RISE_TIME, hours)
-            .apply()
-    }
     
     private fun saveKeepScreenOnSetting(enabled: Boolean) {
         sharedPreferences.edit()

@@ -407,51 +407,6 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Default Rise Time -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_time"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Default rise time" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Default Rise Time"
-                            android:textAppearance="?attr/textAppearanceBody1" />
-
-                        <TextView
-                            android:id="@+id/textViewDefaultRiseTimeValue"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="24 hours"
-                            android:textAppearance="?attr/textAppearanceBody2"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
-
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonSetDefaultRiseTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Change"
-                        style="@style/Widget.Material3.Button.TextButton" />
-
-                </LinearLayout>
 
                 <!-- Keep Screen On -->
                 <LinearLayout
