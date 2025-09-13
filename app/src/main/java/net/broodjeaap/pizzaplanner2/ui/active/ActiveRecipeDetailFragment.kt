@@ -1,10 +1,12 @@
 package net.broodjeaap.pizzaplanner2.ui.active
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -22,6 +24,7 @@ import net.broodjeaap.pizzaplanner2.services.AlarmService
 import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeStepsAdapter
 import net.broodjeaap.pizzaplanner2.utils.MarkdownUtils
 import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeDetailFragmentDirections
+import net.broodjeaap.pizzaplanner2.ui.settings.SettingsFragment
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -84,6 +87,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         setupClickListeners()
         loadRecipe()
         updateUI()
+        updateScreenOnSetting()
 
         // If stepId is provided (from alarm), navigate to substeps for that step
         stepId?.let { id ->
@@ -350,6 +354,7 @@ class ActiveRecipeDetailFragment : Fragment() {
         
         loadRecipe()
         updateUI()
+        updateScreenOnSetting()
         
         val message = if (newPausedState) "Recipe paused" else "Recipe resumed"
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -377,6 +382,7 @@ class ActiveRecipeDetailFragment : Fragment() {
             loadRecipe()
             startStepTimer()
             updateUI()
+            updateScreenOnSetting()
             Toast.makeText(requireContext(), "Step completed!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -430,6 +436,9 @@ class ActiveRecipeDetailFragment : Fragment() {
         repository.updateRecipe(recipeId) { currentData ->
             currentData.copy(status = RecipeStatus.COMPLETED)
         }
+        
+        // Clear screen on flag when recipe completes
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Recipe Complete!")
@@ -516,9 +525,46 @@ class ActiveRecipeDetailFragment : Fragment() {
             .show()
     }
     
+    override fun onResume() {
+        super.onResume()
+        updateScreenOnSetting()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Clear screen on flag when fragment loses visibility
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         stepTimer?.cancel()
         _binding = null
+        // Clear screen on flag when view is destroyed
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    private fun updateScreenOnSetting() {
+        val data = activeRecipeData ?: return
+        val activity = activity ?: return
+        
+        // Clear flag first to ensure clean state
+        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        
+        // Apply setting only if recipe is active and not paused
+        if (data.status == RecipeStatus.IN_PROGRESS && !data.isPaused) {
+            val sharedPrefs = requireContext().getSharedPreferences(
+                SettingsFragment.PREFS_NAME,
+                Context.MODE_PRIVATE
+            )
+            val keepScreenOn = sharedPrefs.getBoolean(
+                SettingsFragment.KEY_KEEP_SCREEN_ON,
+                SettingsFragment.DEFAULT_KEEP_SCREEN_ON
+            )
+            
+            if (keepScreenOn) {
+                activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
     }
 }

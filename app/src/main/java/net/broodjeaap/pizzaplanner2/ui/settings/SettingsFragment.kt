@@ -57,24 +57,24 @@ class SettingsFragment : Fragment() {
     
     // Settings keys
     companion object {
-        private const val PREFS_NAME = "pizza_planner_settings"
-        private const val KEY_ALARM_SOUND_URI = "alarm_sound_uri"
-        private const val KEY_VIBRATION_ENABLED = "vibration_enabled"
-        private const val KEY_NOTIFICATION_STYLE = "notification_style"
-        private const val KEY_AUTO_UPDATE_RECIPES = "auto_update_recipes"
-        private const val KEY_DEFAULT_RISE_TIME = "default_rise_time"
-        private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
-        private const val KEY_ALARM_REPEAT = "alarm_repeat"
-        private const val KEY_INCREASING_VOLUME = "increasing_volume"
+        const val PREFS_NAME = "pizza_planner_settings"
+        const val KEY_ALARM_SOUND_URI = "alarm_sound_uri"
+        const val KEY_VIBRATION_ENABLED = "vibration_enabled"
+        const val KEY_NOTIFICATION_STYLE = "notification_style"
+        const val KEY_AUTO_UPDATE_RECIPES = "auto_update_recipes"
+        const val KEY_DEFAULT_RISE_TIME = "default_rise_time"
+        const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
+        const val KEY_ALARM_REPEAT = "alarm_repeat"
+        const val KEY_INCREASING_VOLUME = "increasing_volume"
         
         // Default values
-        private const val DEFAULT_RISE_TIME = 24.0 // hours
-        private const val DEFAULT_VIBRATION = true
-        private const val DEFAULT_AUTO_UPDATE = true
-        private const val DEFAULT_KEEP_SCREEN_ON = false
-        private const val DEFAULT_NOTIFICATION_STYLE = "Full Screen Alarm"
-        private const val DEFAULT_ALARM_REPEAT = true
-        private const val DEFAULT_INCREASING_VOLUME = true
+        const val DEFAULT_RISE_TIME = 24.0 // hours
+        const val DEFAULT_VIBRATION = true
+        const val DEFAULT_AUTO_UPDATE = true
+        const val DEFAULT_KEEP_SCREEN_ON = false
+        const val DEFAULT_NOTIFICATION_STYLE = "Full Screen Alarm"
+        const val DEFAULT_ALARM_REPEAT = true
+        const val DEFAULT_INCREASING_VOLUME = true
     }
     
     // Activity result launcher for ringtone picker
