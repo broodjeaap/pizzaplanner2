@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.PizzaPlanner" parent="Theme.Material3.DayNight">
+    <style name="Theme.PizzaPlanner" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/pizza_orange</item>
         <item name="colorPrimaryVariant">@color/pizza_orange_dark</item>
