@@ -12,6 +12,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +23,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import net.broodjeaap.pizzaplanner2.databinding.FragmentSettingsBinding
 import net.broodjeaap.pizzaplanner2.services.RecipeDownloadService
+import net.broodjeaap.pizzaplanner2.services.RecipeUpdateWorker
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment() {
 
@@ -108,6 +114,11 @@ class SettingsFragment : Fragment() {
             filter,
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
+        
+        // Schedule worker if auto-update is enabled
+        if (getAutoUpdateEnabled()) {
+            scheduleRecipeUpdateWorker()
+        }
     }
     
     private fun initializeSharedPreferences() {
@@ -265,6 +276,29 @@ class SettingsFragment : Fragment() {
         sharedPreferences.edit()
             .putBoolean(KEY_AUTO_UPDATE_RECIPES, enabled)
             .apply()
+            
+        if (enabled) {
+            scheduleRecipeUpdateWorker()
+        } else {
+            cancelRecipeUpdateWorker()
+        }
+    }
+    
+    private fun scheduleRecipeUpdateWorker() {
+        val workRequest = PeriodicWorkRequestBuilder<RecipeUpdateWorker>(1, TimeUnit.DAYS)
+            .setInputData(workDataOf())
+            .build()
+            
+        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+            RecipeUpdateWorker.WORKER_TAG,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+    }
+    
+    private fun cancelRecipeUpdateWorker() {
+        WorkManager.getInstance(requireContext())
+            .cancelUniqueWork(RecipeUpdateWorker.WORKER_TAG)
     }
     
     private fun checkForRecipeUpdates() {
