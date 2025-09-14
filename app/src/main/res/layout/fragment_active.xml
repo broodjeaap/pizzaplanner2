@@ -139,6 +139,53 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Ingredients Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardIngredients"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardActiveRecipe">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ingredients"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Based on your dough ball configuration"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?android:attr/textColorSecondary" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_ingredient" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Current Step Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardCurrentStep"
@@ -150,7 +197,7 @@
             app:cardElevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardActiveRecipe"
+            app:layout_constraintTop_toBottomOf="@id/cardIngredients"
             tools:visibility="visible">
 
             <LinearLayout
@@ -292,30 +339,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- All Steps -->
-        <TextView
-            android:id="@+id/textViewAllStepsTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/all_steps"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardCurrentStep" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewAllSteps"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewAllStepsTitle"
-            tools:itemCount="5"
-            tools:listitem="@layout/item_timeline_step" />
 
         <!-- Recipe Actions -->
         <LinearLayout
@@ -327,7 +350,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recyclerViewAllSteps"
+            app:layout_constraintTop_toBottomOf="@id/cardCurrentStep"
             tools:visibility="visible">
 
             <com.google.android.material.button.MaterialButton

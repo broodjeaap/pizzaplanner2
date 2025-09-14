@@ -22,6 +22,7 @@ import net.broodjeaap.pizzaplanner2.databinding.FragmentActiveBinding
 import net.broodjeaap.pizzaplanner2.databinding.DialogTimelineBinding
 import net.broodjeaap.pizzaplanner2.services.AlarmService
 import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeStepsAdapter
+import net.broodjeaap.pizzaplanner2.ui.planning.IngredientsAdapter
 import net.broodjeaap.pizzaplanner2.utils.MarkdownUtils
 import net.broodjeaap.pizzaplanner2.ui.active.ActiveRecipeDetailFragmentDirections
 import net.broodjeaap.pizzaplanner2.ui.settings.SettingsFragment
@@ -38,8 +39,8 @@ class ActiveRecipeDetailFragment : Fragment() {
     private var activeRecipeData: PlannedRecipeRepository.ActiveRecipeData? = null
     private var recipeId: String = ""
     
-    // Adapter for displaying all steps
-    private lateinit var stepsAdapter: ActiveRecipeStepsAdapter
+    // Adapter for displaying ingredients
+    private lateinit var ingredientsAdapter: IngredientsAdapter
     
     // Timer for step countdown
     private var stepTimer: CountDownTimer? = null
@@ -62,8 +63,14 @@ class ActiveRecipeDetailFragment : Fragment() {
         
         repository = PlannedRecipeRepository(requireContext())
         
-        // Initialize steps adapter
-        stepsAdapter = ActiveRecipeStepsAdapter(0)
+        // Initialize ingredients adapter
+        ingredientsAdapter = IngredientsAdapter()
+        
+        // Setup ingredients RecyclerView
+        binding.recyclerViewIngredients.apply {
+            adapter = ingredientsAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
         
         // Get recipe ID from arguments
         recipeId = arguments?.getString("recipeId") ?: ""
@@ -150,10 +157,6 @@ class ActiveRecipeDetailFragment : Fragment() {
             if (data.status == RecipeStatus.IN_PROGRESS && !data.isPaused) {
                 startStepTimer()
             }
-            // Update the steps adapter with the current step index
-            stepsAdapter = ActiveRecipeStepsAdapter(data.currentStepIndex)
-            binding.recyclerViewAllSteps.adapter = stepsAdapter
-            stepsAdapter.submitList(data.timeline.steps)
         }
     }
     
@@ -168,24 +171,26 @@ class ActiveRecipeDetailFragment : Fragment() {
         showActiveRecipe()
         updateRecipeInfo(data)
         updateCurrentStep(data)
-        updateAllSteps(data)
         updateProgress(data)
     }
     
     private fun showEmptyState() {
         binding.layoutEmptyState.visibility = View.VISIBLE
         binding.cardActiveRecipe.visibility = View.GONE
+        binding.cardIngredients.visibility = View.GONE
         binding.cardCurrentStep.visibility = View.GONE
-        binding.recyclerViewAllSteps.visibility = View.GONE
         binding.layoutRecipeActions.visibility = View.GONE
     }
     
     private fun showActiveRecipe() {
         binding.layoutEmptyState.visibility = View.GONE
         binding.cardActiveRecipe.visibility = View.VISIBLE
+        binding.cardIngredients.visibility = View.VISIBLE
         binding.cardCurrentStep.visibility = View.VISIBLE
-        binding.recyclerViewAllSteps.visibility = View.VISIBLE
         binding.layoutRecipeActions.visibility = View.VISIBLE
+        
+        // Update ingredients display
+        updateIngredientsDisplay()
     }
     
     private fun updateRecipeInfo(data: PlannedRecipeRepository.ActiveRecipeData) {
@@ -261,20 +266,6 @@ class ActiveRecipeDetailFragment : Fragment() {
         }
     }
     
-    private fun updateAllSteps(data: PlannedRecipeRepository.ActiveRecipeData) {
-        // Set up the RecyclerView for all steps
-        binding.recyclerViewAllSteps.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = stepsAdapter
-        }
-        
-        // Update the adapter with the current step index
-        stepsAdapter = ActiveRecipeStepsAdapter(data.currentStepIndex)
-        binding.recyclerViewAllSteps.adapter = stepsAdapter
-        
-        // Submit the list of steps
-        stepsAdapter.submitList(data.timeline.steps)
-    }
     
     private fun startStepTimer() {
         val data = activeRecipeData ?: return
@@ -542,6 +533,18 @@ class ActiveRecipeDetailFragment : Fragment() {
         _binding = null
         // Clear screen on flag when view is destroyed
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+    
+    private fun updateIngredientsDisplay() {
+        val data = activeRecipeData ?: return
+        
+        // Display ingredients from the stored timeline
+        if (data.timeline.ingredients.isNotEmpty()) {
+            binding.cardIngredients.visibility = View.VISIBLE
+            ingredientsAdapter.submitList(data.timeline.ingredients)
+        } else {
+            binding.cardIngredients.visibility = View.GONE
+        }
     }
 
     private fun updateScreenOnSetting() {
