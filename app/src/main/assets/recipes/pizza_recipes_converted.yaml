@@ -546,3 +546,120 @@ recipes:
         description: "Time to make pizza!\n\n![pizza](https://raw.githubusercontent.com/broodjeaap/PizzaRecipes/master/app_init/images/nea_cold_pizza2.png)"
         duration_minutes: 0
         timing: "after_previous"
+  - id: "51_hour_focaccia"
+    name: "51 Hour Focaccia (Weissman)"
+    description: >
+      A 1-2 day focaccia, with a long slow rise in the fridge for flavour
+      Based on: [51 Hour Ultra Airy Focaccia at Home](https://www.youtube.com/watch?v=TveUI2jD_2c)
+      Note: portions is per 23x33cm tray
+    difficulty: "Medium"
+    total_time_hours: 51
+    image_url: "https://cdn.prod.website-files.com/6744d2d124649f6ecd466f50/68ca2e95369a2f1c623a54c8_V3%20(11)-p-2000.jpg"
+    variables:
+      - name: "fridge_rise_time"
+        display: "Fridge Rise Time (hours)"
+        default: 24
+        min: 12
+        max: 48
+        type: "integer"
+        unit: "hours"
+    variables:
+      - name: "proof_time"
+        display: "Proofing time"
+        default: 180
+        min: 120
+        max: 200
+        type: "integer"
+        unit: "minutes"
+    ingredients:
+      - name: "Flour"
+        amount: 450
+        unit: "g"
+        category: "dry"
+      - name: "Water"
+        amount: 360
+        unit: "ml"
+        category: "liquid"
+      - name: "Salt"
+        amount: 8
+        unit: "g"
+        category: "seasoning"
+      - name: "Active Dry Yeast"
+        amount: 2.5
+        unit: "g"
+        category: "leavening"
+    steps:
+      - id: "make_dough"
+        name: "Make the dough"
+        description: "Combine all the ingredients to make the dough and split it into dough balls"
+        duration_minutes: 15
+        timing: "start"
+        notes: "See video: [How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef](https://www.youtube.com/watch?v=8Q_9h6VKm9c)"
+        substeps:
+          - name: "Salt+Yeast+Water"
+            description: >
+              Add the yeast and salt to water that is around 32 degrees celcius
+              [Timestamp](https://youtu.be/TveUI2jD_2c?t=46)
+          - name: "Flour"
+            description: >
+              Add the salt/water/yeast mix to the flour in a big bowl and thoroughly mix, it will be very sticky!
+              [Timestamp](https://youtu.be/TveUI2jD_2c?t=72)
+      - id: "stretch_and_fold_1"
+        name: "Stretch and fold #1"
+        description: >
+          Stretch and fold the dough for the first time
+        duration_minutes: 15
+        timing: "after_previous"
+      - id: "stretch_and_fold_2"
+        name: "Stretch and fold #2"
+        description: >
+          Stretch and fold the dough for the second time
+        duration_minutes: 30
+        timing: "after_previous"
+      - id: "stretch_and_fold_3"
+        name: "Stretch and fold #3"
+        description: >
+          Stretch and fold the dough for the third time
+        duration_minutes: 30
+        timing: "after_previous"
+      - id: "stretch_and_fold_4"
+        name: "Stretch and fold #4"
+        description: >
+          Stretch and fold the dough for the fourth time
+        duration_minutes: 30
+        timing: "after_previous"
+      - id: "stretch_and_fold_5"
+        name: "Stretch and fold #5"
+        description: >
+          Stretch and fold the dough for the fifth time
+        duration_minutes: 30
+        timing: "after_previous"
+      - id: "fridge_rise"
+        name: "Fridge Rise"
+        description: >
+          Transfer the dough to the fridge for the long cold rise
+        duration_formula: "fridge_rise_time * 60"
+        timing: "after_previous"
+      - id: "proof"
+        name: "Proof"
+        description: >
+          Add a good amount of olive oil to the baking tray and transfer the dough to the baking tray and let it proof for another 3 hours
+          [Timestamp](https://youtu.be/TveUI2jD_2c?t=362)
+        duration_formula: "proof_time"
+        timing: "after_previous"
+      - id: "baking"
+        name: "Bake the focaccia"
+        description: >
+          Add a generous amount of olive oil and dimple the dough, then sprinkle some salt on the dough.
+          You can of course add many other things to your focaccia at this point :)
+          [Timestamp](https://youtu.be/TveUI2jD_2c?t=441)
+        duration_minutes: 20
+        timing: "after_previous"
+      - id: "facaccia_time"
+        name: "Focaccia Time!"
+        description: >
+          Take your focaccia out of the oven!
+          Don't get greedy, let it cool for a bit and then... Enjoy!
+          (Could be that 20 minutes isn't enough, leave it in a bit longer then)
+        duration_minutes: 0
+        timing: "after_previous"
