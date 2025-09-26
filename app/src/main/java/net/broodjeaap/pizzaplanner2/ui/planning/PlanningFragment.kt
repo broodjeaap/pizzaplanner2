@@ -191,8 +191,7 @@ class PlanningFragment : Fragment() {
     private fun showRecipeSelectionDialog() {
         lifecycleScope.launch {
             try {
-                val inputStream = requireContext().assets.open("recipes/pizza_recipes_converted.yaml")
-                val recipes = YamlParser().parseRecipes(inputStream)
+                val recipes = net.broodjeaap.pizzaplanner2.utils.RecipeLoader.loadRecipes(requireContext())
                 val recipeNames = recipes.map { it.name }.toTypedArray()
                 
                 MaterialAlertDialogBuilder(requireContext())

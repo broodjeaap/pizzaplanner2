@@ -84,9 +84,7 @@ class RecipesFragment : Fragment() {
 
     private fun loadRecipes() {
         try {
-            val inputStream = requireContext().assets.open("recipes/pizza_recipes_converted.yaml")
-            val yamlParser = YamlParser()
-            val recipes = yamlParser.parseRecipes(inputStream)
+            val recipes = net.broodjeaap.pizzaplanner2.utils.RecipeLoader.loadRecipes(requireContext())
             viewModel.setRecipes(recipes)
         } catch (e: Exception) {
             viewModel.setError("Failed to load recipes: ${e.message}")
