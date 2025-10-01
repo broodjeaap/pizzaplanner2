@@ -563,7 +563,6 @@ recipes:
         max: 48
         type: "integer"
         unit: "hours"
-    variables:
       - name: "proof_time"
         display: "Proofing time"
         default: 180
