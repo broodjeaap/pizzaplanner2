@@ -116,7 +116,7 @@ class PlanningFragment : Fragment() {
             
             // Check if this is a time-related variable that affects the recipe duration
             if (isTimeVariable(variableId)) {
-                updateTargetTimeForTimeVariables()
+                //updateTargetTimeForTimeVariables()
             }
             
             updateTimeline()
